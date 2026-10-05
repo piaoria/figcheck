@@ -1,0 +1,134 @@
+<!doctype html><html lang="ko"><head><meta charset="UTF-8"><style>body{margin:20px;font:13px/1.6 system-ui;background:var(--figma-color-bg,#fff);color:var(--figma-color-text,#172133)}h1{font-size:23px;margin:0}p{color:var(--figma-color-text-secondary,#566477)}button{padding:9px 14px;border:0;border-radius:6px;background:#2261dc;color:white;cursor:pointer}button:disabled{opacity:.4;cursor:default}#refresh,#close{background:#e8edf4;color:#172133}pre{white-space:pre-wrap;word-break:break-word;font-size:11px;max-height:260px;overflow:auto;background:var(--figma-color-bg-secondary,#f4f6fa);padding:12px}.actions{display:flex;gap:6px}</style></head><body><h1>FigCheck</h1><p>노드 하나 선택 → JSON export → Chrome DevTools에서 수동 비교</p><p id="status" role="status">선택 확인 중…</p><div class="actions"><button id="download" disabled>JSON 내보내기</button><button id="refresh">새로 추출</button><button id="close">닫기</button></div><p>단일 노드만 내보냅니다. 하위 노드는 각각 선택해 추출하세요. mixed/AUTO/복합값은 사유와 함께 제외됩니다. 디자인을 수정한 후 새로 추출하세요.</p><pre id="preview"></pre><script>"use strict";
+(() => {
+  // packages/core/src/index.ts
+  var VERSION = "1.0";
+  var categories = {
+    size: ["width", "height"],
+    spacing: ["paddingTop", "paddingRight", "paddingBottom", "paddingLeft", "rowGap", "columnGap"],
+    typography: ["fontFamily", "fontSize", "fontWeight", "lineHeight", "letterSpacing"],
+    color: ["textColor", "backgroundColor"],
+    border: ["borderTopWidth", "borderRightWidth", "borderBottomWidth", "borderLeftWidth", "borderTopColor", "borderRightColor", "borderBottomColor", "borderLeftColor", "radiusTopLeft", "radiusTopRight", "radiusBottomRight", "radiusBottomLeft"],
+    appearance: ["opacity"]
+  };
+  var keys = Object.values(categories).flat();
+  var unavailable = (reason, status2 = "unsupported") => ({ status: status2, reason });
+  function kindFor(key) {
+    if (key.endsWith("Color")) return "rgba";
+    if (key === "fontFamily") return "string";
+    if (key === "fontWeight" || key === "opacity") return "number";
+    return "px";
+  }
+  var record = (v) => typeof v === "object" && v !== null && !Array.isArray(v);
+  function assert(condition, message) {
+    if (!condition) throw new Error(message);
+  }
+  function boundedText(v, name) {
+    assert(typeof v === "string" && v.length > 0 && v.length <= 2048, `${name}: 1~2048\uC790 \uBB38\uC790\uC5F4 \uD544\uC694`);
+  }
+  function exactKeys(v, allowed, path) {
+    assert(Object.keys(v).every((k) => allowed.includes(k)), `${path}: \uC54C \uC218 \uC5C6\uB294 \uD0A4 \uB610\uB294 \uC704\uD5D8\uD55C \uD0A4`);
+  }
+  function validateProperties(v) {
+    assert(record(v), "properties \uAC1D\uCCB4 \uD544\uC694");
+    exactKeys(v, keys, "properties");
+    for (const key of keys) {
+      const p = v[key];
+      assert(record(p), `${key}: \uBA85\uC2DC\uC801 status \uD544\uC694`);
+      if (p.status === "supported") {
+        exactKeys(p, ["status", "kind", "value", "note"], key);
+        assert(p.kind === kindFor(key), `${key}: \uC18D\uC131\uC5D0 \uB9DE\uB294 kind \uD544\uC694`);
+        if (p.kind === "rgba") assert(Array.isArray(p.value) && p.value.length === 4 && p.value.every((n, i) => typeof n === "number" && Number.isFinite(n) && n >= 0 && n <= (i === 3 ? 1 : 255)), `${key}: RGBA \uBC94\uC704 \uC624\uB958`);
+        else if (p.kind === "string") boundedText(p.value, key);
+        else {
+          assert(typeof p.value === "number" && Number.isFinite(p.value) && Math.abs(p.value) <= 1e7, `${key}: \uC720\uD55C\uD55C \uC22B\uC790 \uD544\uC694`);
+          assert(key === "letterSpacing" || p.value >= 0, `${key}: \uC74C\uC218 \uBD88\uAC00`);
+          if (key === "opacity") assert(p.value <= 1, "opacity \uBC94\uC704 0~1");
+          if (key === "fontWeight") assert(p.value >= 1 && p.value <= 1e3, "fontWeight \uBC94\uC704 1~1000");
+        }
+        if ("note" in p) boundedText(p.note, `${key}.note`);
+      } else {
+        exactKeys(p, ["status", "reason"], key);
+        assert(p.status === "unknown" || p.status === "unsupported", `${key}: \uC798\uBABB\uB41C status`);
+        boundedText(p.reason, key);
+      }
+    }
+  }
+  function parseDesign(text) {
+    assert(text.length <= 1024 * 1024, "JSON \uCD5C\uB300 1 MiB");
+    const doc2 = JSON.parse(text);
+    assert(record(doc2), "\uBB38\uC11C \uAC1D\uCCB4 \uD544\uC694");
+    exactKeys(doc2, ["schemaVersion", "source", "exportedAt", "colorProfile", "nodes"], "document");
+    assert(doc2.schemaVersion === VERSION, "\uC9C0\uC6D0 schemaVersion\uC740 1.0\uC785\uB2C8\uB2E4. \uC784\uC758\uC758 \uAD6C\uD615 JSON\uC740 \uC790\uB3D9 \uBCC0\uD658\uD558\uC9C0 \uC54A\uC2B5\uB2C8\uB2E4.");
+    assert(doc2.source === "figma", "source\uB294 figma\uC5EC\uC57C \uD569\uB2C8\uB2E4");
+    if ("colorProfile" in doc2) assert(["SRGB", "DISPLAY_P3", "UNKNOWN"].includes(String(doc2.colorProfile)), "colorProfile \uC624\uB958");
+    boundedText(doc2.exportedAt, "exportedAt");
+    assert(Number.isFinite(Date.parse(doc2.exportedAt)), "exportedAt \uB0A0\uC9DC \uC624\uB958");
+    assert(Array.isArray(doc2.nodes) && doc2.nodes.length > 0, "nodes \uBC30\uC5F4\uC774 \uBE44\uC5B4 \uC788\uC2B5\uB2C8\uB2E4");
+    let count = 0;
+    const ids = /* @__PURE__ */ new Set();
+    function node(v, depth) {
+      assert(++count <= 256 && depth <= 16, "\uB178\uB4DC \uCD5C\uB300 256\uAC1C / \uAE4A\uC774 \uCD5C\uB300 16");
+      assert(record(v), "node \uAC1D\uCCB4 \uD544\uC694");
+      exactKeys(v, ["id", "name", "type", "properties", "children"], "node");
+      boundedText(v.id, "id");
+      boundedText(v.name, "name");
+      boundedText(v.type, "type");
+      assert(!ids.has(v.id), "\uC911\uBCF5 node id");
+      ids.add(v.id);
+      validateProperties(v.properties);
+      if ("children" in v) {
+        assert(Array.isArray(v.children), "children \uBC30\uC5F4 \uD544\uC694");
+        v.children.forEach((c) => node(c, depth + 1));
+      }
+    }
+    doc2.nodes.forEach((n) => node(n, 0));
+    if (doc2.colorProfile === "DISPLAY_P3" || doc2.colorProfile === "UNKNOWN") {
+      const excludeColors = (n) => {
+        for (const k of keys.filter((k2) => k2.endsWith("Color"))) n.properties[k] = unavailable(`Figma ${doc2.colorProfile} \uC0C9\uACF5\uAC04: sRGB \uBCC0\uD658 \uBBF8\uC9C0\uC6D0`);
+        n.children?.forEach(excludeColors);
+      };
+      doc2.nodes.forEach(excludeColors);
+    }
+    return doc2;
+  }
+
+  // apps/figma-plugin/src/ui.ts
+  var status = document.querySelector("#status");
+  var preview = document.querySelector("#preview");
+  var download = document.querySelector("#download");
+  var doc;
+  var send = (type) => parent.postMessage({ pluginMessage: { type } }, "*");
+  window.onmessage = (event) => {
+    if (event.source !== parent) return;
+    const msg = event.data?.pluginMessage;
+    if (msg?.type !== "selection") return;
+    doc = void 0;
+    download.disabled = true;
+    preview.textContent = "";
+    if (msg.error) {
+      status.textContent = String(msg.error);
+      return;
+    }
+    try {
+      doc = parseDesign(JSON.stringify(msg.document));
+      download.disabled = false;
+      status.textContent = `${doc.nodes[0].name} \xB7 ${doc.nodes[0].type} \xB7 schema ${doc.schemaVersion}`;
+      preview.textContent = JSON.stringify(doc, null, 2);
+    } catch (e) {
+      status.textContent = e instanceof Error ? e.message : "\uB370\uC774\uD130 \uC624\uB958";
+    }
+  };
+  download.onclick = () => {
+    if (!doc) return;
+    const url = URL.createObjectURL(new Blob([JSON.stringify(doc, null, 2)], { type: "application/json" }));
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "figcheck-selection.json";
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1e3);
+  };
+  document.querySelector("#refresh").onclick = () => send("refresh");
+  document.querySelector("#close").onclick = () => send("close");
+  send("refresh");
+})();
+</script></body></html>

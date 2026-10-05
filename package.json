@@ -1,0 +1,32 @@
+{
+  "name": "figcheck",
+  "version": "0.3.7",
+  "private": true,
+  "description": "Local, manually paired Figma and DOM property comparison",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "test": "tsx --test tests/*.test.ts",
+    "build": "node scripts/build.mjs",
+    "verify": "node scripts/verify.mjs",
+    "test:browser": "node scripts/browser-test.mjs && node scripts/plugin-browser-test.mjs",
+    "fixture": "node scripts/fixture-server.mjs",
+    "package": "python scripts/package.py",
+    "test:plugin-browser": "node scripts/plugin-browser-test.mjs"
+  },
+  "devDependencies": {
+    "@figma/plugin-typings": "^1.117.0",
+    "@types/chrome": "^0.1.0",
+    "@types/node": "^22.0.0",
+    "typescript": "^5.8.3",
+    "esbuild": "^0.25.0",
+    "tsx": "^4.19.0",
+    "eslint": "^9.0.0",
+    "typescript-eslint": "^8.0.0",
+    "playwright": "^1.51.0"
+  }
+}

@@ -1,0 +1,15 @@
+import {writeFile,mkdir} from 'node:fs/promises';
+import {emptyProperties,numberValue,colorValue,stringValue,parseDesign} from '../packages/core/dist/index.mjs';
+await mkdir('fixtures',{recursive:true});
+const card=emptyProperties('FRAME: 텍스트는 별도 TEXT 노드로 선택');
+for(const [k,v] of Object.entries({width:240,height:80,paddingTop:16,paddingRight:20,paddingBottom:16,paddingLeft:20,rowGap:8,columnGap:12,borderTopWidth:2,borderRightWidth:2,borderBottomWidth:2,borderLeftWidth:2,radiusTopLeft:8,radiusTopRight:8,radiusBottomRight:8,radiusBottomLeft:8}))card[k]=numberValue(v);
+card.backgroundColor=colorValue([30,90,200,1]);card.opacity=numberValue(.9,'number');
+for(const k of ['borderTopColor','borderRightColor','borderBottomColor','borderLeftColor'])card[k]=colorValue([10,40,100,1]);
+const text=emptyProperties('TEXT: layout padding/gap/radius 정의 없음');
+for(const[k,v]of Object.entries({width:100,height:24,fontSize:16,lineHeight:24,letterSpacing:.5,borderTopWidth:0,borderRightWidth:0,borderBottomWidth:0,borderLeftWidth:0}))text[k]=numberValue(v);
+text.fontWeight=numberValue(600,'number');text.fontFamily=stringValue('Arial');text.textColor=colorValue([30,40,50,1]);text.backgroundColor=colorValue([0,0,0,0]);text.opacity=numberValue(1,'number');
+const doc={schemaVersion:'1.0',source:'figma',colorProfile:'SRGB',exportedAt:'2026-10-04T00:00:00.000Z',nodes:[{id:'demo:card',name:'Demo card → #card',type:'FRAME',properties:card},{id:'demo:text',name:'Demo text → #text',type:'TEXT',properties:text}]};
+parseDesign(JSON.stringify(doc));await writeFile('fixtures/sample.json',JSON.stringify(doc,null,2));
+const nested={...doc,nodes:[{...doc.nodes[0],children:[doc.nodes[1]]}]};await writeFile('fixtures/sample-nested.json',JSON.stringify(nested,null,2));
+await writeFile('fixtures/invalid.json','{"schemaVersion":"0.0","nodes":[]}');
+console.log('Samples created: flat/manual and nested/manual + invalid import fixture');

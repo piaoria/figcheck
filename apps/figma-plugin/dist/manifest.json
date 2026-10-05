@@ -1,0 +1,16 @@
+{
+  "name": "FigCheck 0.3.7 (local)",
+  "id": "figcheck-local-mvp",
+  "api": "1.0.0",
+  "main": "code.js",
+  "ui": "ui.html",
+  "editorType": [
+    "figma"
+  ],
+  "documentAccess": "dynamic-page",
+  "networkAccess": {
+    "allowedDomains": [
+      "none"
+    ]
+  }
+}

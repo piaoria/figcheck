@@ -1,0 +1,27 @@
+{
+  "manifest_version": 3,
+  "name": "FigCheck",
+  "version": "0.3.7",
+  "description": "수동 선택한 Figma 노드와 Elements DOM 속성을 로컬에서 비교합니다.",
+  "devtools_page": "devtools.html",
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'none'; connect-src 'none'; font-src 'self'"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "commands": {
+    "figcheck-pick": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+X",
+        "mac": "Command+Shift+X"
+      },
+      "description": "FigCheck 요소 선택 모드 켜기/취소"
+    }
+  },
+  "minimum_chrome_version": "140",
+  "action": {
+    "default_title": "FigCheck · DevTools에서 비교",
+    "default_popup": "help.html"
+  }
+}

@@ -1,0 +1,317 @@
+{
+  "schemaVersion": "1.0",
+  "source": "figma",
+  "colorProfile": "SRGB",
+  "exportedAt": "2026-10-04T00:00:00.000Z",
+  "nodes": [
+    {
+      "id": "demo:card",
+      "name": "Demo card → #card",
+      "type": "FRAME",
+      "properties": {
+        "width": {
+          "status": "supported",
+          "kind": "px",
+          "value": 240
+        },
+        "height": {
+          "status": "supported",
+          "kind": "px",
+          "value": 80
+        },
+        "paddingTop": {
+          "status": "supported",
+          "kind": "px",
+          "value": 16
+        },
+        "paddingRight": {
+          "status": "supported",
+          "kind": "px",
+          "value": 20
+        },
+        "paddingBottom": {
+          "status": "supported",
+          "kind": "px",
+          "value": 16
+        },
+        "paddingLeft": {
+          "status": "supported",
+          "kind": "px",
+          "value": 20
+        },
+        "rowGap": {
+          "status": "supported",
+          "kind": "px",
+          "value": 8
+        },
+        "columnGap": {
+          "status": "supported",
+          "kind": "px",
+          "value": 12
+        },
+        "fontFamily": {
+          "status": "unknown",
+          "reason": "FRAME: 텍스트는 별도 TEXT 노드로 선택"
+        },
+        "fontSize": {
+          "status": "unknown",
+          "reason": "FRAME: 텍스트는 별도 TEXT 노드로 선택"
+        },
+        "fontWeight": {
+          "status": "unknown",
+          "reason": "FRAME: 텍스트는 별도 TEXT 노드로 선택"
+        },
+        "lineHeight": {
+          "status": "unknown",
+          "reason": "FRAME: 텍스트는 별도 TEXT 노드로 선택"
+        },
+        "letterSpacing": {
+          "status": "unknown",
+          "reason": "FRAME: 텍스트는 별도 TEXT 노드로 선택"
+        },
+        "textColor": {
+          "status": "unknown",
+          "reason": "FRAME: 텍스트는 별도 TEXT 노드로 선택"
+        },
+        "backgroundColor": {
+          "status": "supported",
+          "kind": "rgba",
+          "value": [
+            30,
+            90,
+            200,
+            1
+          ]
+        },
+        "borderTopWidth": {
+          "status": "supported",
+          "kind": "px",
+          "value": 2
+        },
+        "borderRightWidth": {
+          "status": "supported",
+          "kind": "px",
+          "value": 2
+        },
+        "borderBottomWidth": {
+          "status": "supported",
+          "kind": "px",
+          "value": 2
+        },
+        "borderLeftWidth": {
+          "status": "supported",
+          "kind": "px",
+          "value": 2
+        },
+        "borderTopColor": {
+          "status": "supported",
+          "kind": "rgba",
+          "value": [
+            10,
+            40,
+            100,
+            1
+          ]
+        },
+        "borderRightColor": {
+          "status": "supported",
+          "kind": "rgba",
+          "value": [
+            10,
+            40,
+            100,
+            1
+          ]
+        },
+        "borderBottomColor": {
+          "status": "supported",
+          "kind": "rgba",
+          "value": [
+            10,
+            40,
+            100,
+            1
+          ]
+        },
+        "borderLeftColor": {
+          "status": "supported",
+          "kind": "rgba",
+          "value": [
+            10,
+            40,
+            100,
+            1
+          ]
+        },
+        "radiusTopLeft": {
+          "status": "supported",
+          "kind": "px",
+          "value": 8
+        },
+        "radiusTopRight": {
+          "status": "supported",
+          "kind": "px",
+          "value": 8
+        },
+        "radiusBottomRight": {
+          "status": "supported",
+          "kind": "px",
+          "value": 8
+        },
+        "radiusBottomLeft": {
+          "status": "supported",
+          "kind": "px",
+          "value": 8
+        },
+        "opacity": {
+          "status": "supported",
+          "kind": "number",
+          "value": 0.9
+        }
+      }
+    },
+    {
+      "id": "demo:text",
+      "name": "Demo text → #text",
+      "type": "TEXT",
+      "properties": {
+        "width": {
+          "status": "supported",
+          "kind": "px",
+          "value": 100
+        },
+        "height": {
+          "status": "supported",
+          "kind": "px",
+          "value": 24
+        },
+        "paddingTop": {
+          "status": "unknown",
+          "reason": "TEXT: layout padding/gap/radius 정의 없음"
+        },
+        "paddingRight": {
+          "status": "unknown",
+          "reason": "TEXT: layout padding/gap/radius 정의 없음"
+        },
+        "paddingBottom": {
+          "status": "unknown",
+          "reason": "TEXT: layout padding/gap/radius 정의 없음"
+        },
+        "paddingLeft": {
+          "status": "unknown",
+          "reason": "TEXT: layout padding/gap/radius 정의 없음"
+        },
+        "rowGap": {
+          "status": "unknown",
+          "reason": "TEXT: layout padding/gap/radius 정의 없음"
+        },
+        "columnGap": {
+          "status": "unknown",
+          "reason": "TEXT: layout padding/gap/radius 정의 없음"
+        },
+        "fontFamily": {
+          "status": "supported",
+          "kind": "string",
+          "value": "Arial"
+        },
+        "fontSize": {
+          "status": "supported",
+          "kind": "px",
+          "value": 16
+        },
+        "fontWeight": {
+          "status": "supported",
+          "kind": "number",
+          "value": 600
+        },
+        "lineHeight": {
+          "status": "supported",
+          "kind": "px",
+          "value": 24
+        },
+        "letterSpacing": {
+          "status": "supported",
+          "kind": "px",
+          "value": 0.5
+        },
+        "textColor": {
+          "status": "supported",
+          "kind": "rgba",
+          "value": [
+            30,
+            40,
+            50,
+            1
+          ]
+        },
+        "backgroundColor": {
+          "status": "supported",
+          "kind": "rgba",
+          "value": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "borderTopWidth": {
+          "status": "supported",
+          "kind": "px",
+          "value": 0
+        },
+        "borderRightWidth": {
+          "status": "supported",
+          "kind": "px",
+          "value": 0
+        },
+        "borderBottomWidth": {
+          "status": "supported",
+          "kind": "px",
+          "value": 0
+        },
+        "borderLeftWidth": {
+          "status": "supported",
+          "kind": "px",
+          "value": 0
+        },
+        "borderTopColor": {
+          "status": "unknown",
+          "reason": "TEXT: layout padding/gap/radius 정의 없음"
+        },
+        "borderRightColor": {
+          "status": "unknown",
+          "reason": "TEXT: layout padding/gap/radius 정의 없음"
+        },
+        "borderBottomColor": {
+          "status": "unknown",
+          "reason": "TEXT: layout padding/gap/radius 정의 없음"
+        },
+        "borderLeftColor": {
+          "status": "unknown",
+          "reason": "TEXT: layout padding/gap/radius 정의 없음"
+        },
+        "radiusTopLeft": {
+          "status": "unknown",
+          "reason": "TEXT: layout padding/gap/radius 정의 없음"
+        },
+        "radiusTopRight": {
+          "status": "unknown",
+          "reason": "TEXT: layout padding/gap/radius 정의 없음"
+        },
+        "radiusBottomRight": {
+          "status": "unknown",
+          "reason": "TEXT: layout padding/gap/radius 정의 없음"
+        },
+        "radiusBottomLeft": {
+          "status": "unknown",
+          "reason": "TEXT: layout padding/gap/radius 정의 없음"
+        },
+        "opacity": {
+          "status": "supported",
+          "kind": "number",
+          "value": 1
+        }
+      }
+    }
+  ]
+}

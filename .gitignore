@@ -1,0 +1,10 @@
+node_modules/
+artifacts/
+release/
+*.log
+.env*
+
+__pycache__/
+*.pyc
+*checkpoint*.json
+*library-metadata*.json

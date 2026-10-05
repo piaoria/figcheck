@@ -1,0 +1,15 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>FigCheck 로컬 비교 fixture</title><link rel="stylesheet" href="http://127.0.0.1:4174/foreign.css"><style>
+body{font:14px/1.6 Arial,sans-serif;margin:32px;color:#25354c;background:#f6f8fc}h1{font-size:26px}section{margin:24px 0;padding:20px;border:1px solid #dae3ef;background:white;border-radius:8px}code{background:#e9eff7;padding:3px 6px}
+#card{display:flex;flex-wrap:wrap;box-sizing:border-box;width:240px;height:80px;padding:16px 20px;column-gap:12px;row-gap:8px;background:rgb(30,90,200);border:2px solid rgb(10,40,100);border-radius:8px;opacity:.9;color:white}#card .child{font:600 16px/24px Arial}
+#text{display:block;width:100px;height:24px;font:600 16px/24px Arial,sans-serif;letter-spacing:.5px;color:rgb(30,40,50);background:none;opacity:1}
+#box{width:100px;height:40px;padding:10px;border:2px solid #123;box-sizing:content-box}#transformed-parent{transform:scale(1.2);transform-origin:left}#transformed{width:100px;height:20px}#normal{line-height:normal;letter-spacing:normal}#gradient{width:100px;height:40px;background:linear-gradient(red,blue)}
+.duplicate{width:120px;color:rgb(20,30,40)}#candidate{width:120px;color:rgb(20,30,40)}
+@layer first,second;@layer first{#layered{color:rgb(255,0,0)!important}}@layer second{#layered{color:rgb(0,0,255)!important}}
+#overridden{color:rgb(0,128,0)!important}@media(min-width:1px){.duplicate{padding:4px}}@supports(display:grid){.duplicate{border-radius:3px}}
+</style></head><body><h1>FigCheck 검증 페이지</h1><p>DevTools → Elements에서 아래 ID의 요소를 선택하고 FigCheck 패널로 이동하세요. 비교 노드는 JSON 목록에서 수동 선택합니다.</p>
+<section><p><code>#card</code> ↔ sample.json의 Demo card: 240×80, padding, row/column gap, border, 색, opacity. 자식 텍스트는 비교 제외.</p><div id="card"><span class="child">FigCheck</span></div></section>
+<section><p><code>#text</code> ↔ sample.json의 Demo text: Arial 16px/600, line-height 24px, letter-spacing .5px.</p><div id="text">FigCheck</div></section>
+<section><p><code>#box</code>: content-box 100px + padding20 + border4 = 실제 border-box 124px.</p><div id="box">box</div></section>
+<section><p>비교 불가/근거의 한계</p><div id="transformed-parent"><div id="transformed">ancestor transform</div></div><p id="normal">normal typography</p><div id="gradient">gradient</div><p id="candidate" class="duplicate">동일 값 두 규칙 (승자 단정 불가)</p><p id="overridden" style="color:red">inline red overridden by important green</p><p id="layered" style="color:purple">layer important 역순: first red</p><p id="cross" class="cross-origin">별도 origin stylesheet: 값 적용, CSSOM 접근불가</p><div id="mixed">parent <strong style="font-size:24px">mixed child</strong></div><div id="remove-me">선택 후 콘솔에서 $0.remove()로 stale 확인</div></section>
+<section><p><code>#percent</code>: percent/calc는 computed px로 해석되면 비교 가능. 원시 표기는 CSS 후보 근거에 남습니다.</p><div style="width:200px"><div id="percent" style="width:50%;height:calc(10px + 10px);padding:1rem">resolved units</div></div><iframe id="frame" srcdoc="<div id='inside' style='width:90px;height:20px'>iframe element</div>"></iframe></section>
+</body></html>

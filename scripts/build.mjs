@@ -1,0 +1,41 @@
+import { build } from 'esbuild';
+import { mkdir, readFile, writeFile, copyFile } from 'node:fs/promises';
+import path from 'node:path';
+const root = process.cwd();
+const themeSource = await readFile('packages/ui/theme.css','utf8');
+const font = await readFile('packages/ui/fonts/PretendardVariable.woff2');
+const theme = themeSource.replace('/*FONT_SOURCE*/','fonts/PretendardVariable.woff2');
+const figmaTheme = themeSource.replace('/*FONT_SOURCE*/','data:font/woff2;base64,'+font.toString('base64'));
+const figma = path.join(root, 'apps/figma-plugin/dist'), chrome = path.join(root, 'apps/chrome-extension/dist');
+await mkdir(figma, { recursive: true }); await mkdir(chrome, { recursive: true });
+const settings = { bundle: true, target: 'es2020', legalComments: 'none', logLevel: 'warning' };
+await build({ ...settings, entryPoints: ['apps/figma-plugin/src/code.ts'], outfile: path.join(figma, 'code.js'), format: 'iife' });
+const ui = await build({ ...settings, entryPoints: ['apps/figma-plugin/src/ui.ts'], write: false, format: 'iife' });
+await writeFile(path.join(figma, 'ui.html'), (await readFile('apps/figma-plugin/ui.html', 'utf8')).replace('/*THEME*/',figmaTheme).replace('<!--SCRIPT-->', `<script>${ui.outputFiles[0].text.replace(/<\/script/gi, '<\\/script')}</script>`));
+const figmaManifest=JSON.parse(await readFile('apps/figma-plugin/manifest.json','utf8'));
+await writeFile(path.join(figma,'manifest.json'),JSON.stringify({...figmaManifest,main:'code.js',ui:'ui.html'},null,2));
+for (const entry of ['devtools', 'panel', 'background']) await build({ ...settings, entryPoints: [`apps/chrome-extension/src/${entry}.ts`], outfile: path.join(chrome, `${entry}.js`), format: 'iife' });
+for (const file of ['manifest.json', 'devtools.html', 'panel.html', 'help.html']) await copyFile(`apps/chrome-extension/${file}`, path.join(chrome, file));
+await writeFile(path.join(chrome,'style.css'),(await readFile('apps/chrome-extension/style.css','utf8')).replace('/*THEME*/',theme));
+await writeFile(path.join(chrome,'theme.css'),theme);
+await mkdir(path.join(chrome,'fonts'),{recursive:true});
+for(const name of ['PretendardVariable.woff2','LICENSE'])await copyFile('packages/ui/fonts/'+name,path.join(chrome,'fonts',name));
+await copyFile('packages/ui/fonts/LICENSE',path.join(figma,'Pretendard-LICENSE.txt'));
+await mkdir('packages/core/dist', { recursive: true });
+await build({ ...settings, entryPoints: ['packages/core/src/index.ts'], outfile: 'packages/core/dist/index.mjs', platform: 'node', format: 'esm' });
+// Testing the real collector separately does not require extension permissions.
+await mkdir('artifacts', { recursive: true });
+await build({ ...settings, entryPoints: ['apps/chrome-extension/src/collect.ts'], outfile: 'artifacts/collector.mjs', format: 'esm' });
+await build({ ...settings, entryPoints: ['apps/chrome-extension/src/picker.ts'], outfile: 'artifacts/picker.mjs', format: 'esm' });
+await build({ ...settings, entryPoints: ['apps/chrome-extension/src/command.ts'], outfile: 'artifacts/command.mjs', format: 'esm' });
+const { keys, kindFor } = await import('../packages/core/dist/index.mjs');
+const definitions = {};
+for (const key of keys) {
+  const kind = kindFor(key);
+  const value = kind === 'rgba' ? { type: 'array', prefixItems: [0,1,2].map(() => ({type:'number',minimum:0,maximum:255})).concat({type:'number',minimum:0,maximum:1}), minItems:4,maxItems:4 } : kind === 'string' ? {type:'string',minLength:1,maxLength:2048} : {type:'number',minimum:key==='letterSpacing'?-1e7:key==='fontWeight'?1:0,maximum:key==='opacity'?1:key==='fontWeight'?1000:1e7};
+  definitions[key] = { oneOf: [ { type: 'object', additionalProperties: false, required: ['status','kind','value'], properties: {status:{const:'supported'},kind:{const:kind},value,note:{type:'string',minLength:1,maxLength:2048}} }, { type:'object',additionalProperties:false,required:['status','reason'],properties:{status:{enum:['unsupported','unknown']},reason:{type:'string',minLength:1,maxLength:2048}} } ] };
+}
+const text = {type:'string',minLength:1,maxLength:2048};
+const schema = {$schema:'https://json-schema.org/draft/2020-12/schema',$id:'urn:figcheck:schema:1.0',title:'FigCheck design exchange v1.0',type:'object',additionalProperties:false,required:['schemaVersion','source','exportedAt','nodes'],properties:{schemaVersion:{const:'1.0'},source:{const:'figma'},exportedAt:{type:'string',format:'date-time'},colorProfile:{enum:['SRGB','DISPLAY_P3','UNKNOWN']},nodes:{type:'array',minItems:1,maxItems:256,items:{$ref:'#/$defs/node'}}},$defs:{node:{type:'object',additionalProperties:false,required:['id','name','type','properties'],properties:{id:text,name:text,type:text,properties:{type:'object',additionalProperties:false,required:keys,properties:definitions},children:{type:'array',maxItems:256,items:{$ref:'#/$defs/node'}}}}}};
+await mkdir('schemas', { recursive: true }); await writeFile('schemas/figcheck-1.0.schema.json', JSON.stringify(schema,null,2));
+console.log('Built Figma manifest/code/ui + MV3 unpacked extension + versioned JSON schema');

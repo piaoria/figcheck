@@ -1,0 +1,5 @@
+# Preserve tested installable assets and clipboard fixtures byte-for-byte.
+apps/**/dist/** -text
+packages/core/dist/** -text
+fixtures/** -text
+tests/fixtures/** -text

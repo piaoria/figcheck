@@ -1,0 +1,291 @@
+{
+  "source": "User reported displayed values; exact raw color was not supplied",
+  "expected": {
+    "width": {
+      "status": "supported",
+      "kind": "px",
+      "value": 282
+    },
+    "height": {
+      "status": "supported",
+      "kind": "px",
+      "value": 450.5
+    },
+    "paddingTop": {
+      "status": "unsupported",
+      "reason": "report scope: not supplied"
+    },
+    "paddingRight": {
+      "status": "unsupported",
+      "reason": "report scope: not supplied"
+    },
+    "paddingBottom": {
+      "status": "unsupported",
+      "reason": "report scope: not supplied"
+    },
+    "paddingLeft": {
+      "status": "unsupported",
+      "reason": "report scope: not supplied"
+    },
+    "rowGap": {
+      "status": "unsupported",
+      "reason": "report scope: not supplied"
+    },
+    "columnGap": {
+      "status": "unsupported",
+      "reason": "report scope: not supplied"
+    },
+    "fontFamily": {
+      "status": "unsupported",
+      "reason": "report scope: not supplied"
+    },
+    "fontSize": {
+      "status": "unsupported",
+      "reason": "report scope: not supplied"
+    },
+    "fontWeight": {
+      "status": "unsupported",
+      "reason": "report scope: not supplied"
+    },
+    "lineHeight": {
+      "status": "unsupported",
+      "reason": "report scope: not supplied"
+    },
+    "letterSpacing": {
+      "status": "unsupported",
+      "reason": "report scope: not supplied"
+    },
+    "textColor": {
+      "status": "unsupported",
+      "reason": "report scope: not supplied"
+    },
+    "backgroundColor": {
+      "status": "unsupported",
+      "reason": "report scope: not supplied"
+    },
+    "borderTopWidth": {
+      "status": "supported",
+      "kind": "px",
+      "value": 0.6666669845581055
+    },
+    "borderRightWidth": {
+      "status": "supported",
+      "kind": "px",
+      "value": 0.6666669845581055
+    },
+    "borderBottomWidth": {
+      "status": "supported",
+      "kind": "px",
+      "value": 0.6666669845581055
+    },
+    "borderLeftWidth": {
+      "status": "supported",
+      "kind": "px",
+      "value": 0.6666669845581055
+    },
+    "borderTopColor": {
+      "status": "supported",
+      "kind": "rgba",
+      "value": [
+        222,
+        226,
+        230,
+        1
+      ]
+    },
+    "borderRightColor": {
+      "status": "supported",
+      "kind": "rgba",
+      "value": [
+        222,
+        226,
+        230,
+        1
+      ]
+    },
+    "borderBottomColor": {
+      "status": "supported",
+      "kind": "rgba",
+      "value": [
+        222,
+        226,
+        230,
+        1
+      ]
+    },
+    "borderLeftColor": {
+      "status": "supported",
+      "kind": "rgba",
+      "value": [
+        222,
+        226,
+        230,
+        1
+      ]
+    },
+    "radiusTopLeft": {
+      "status": "unsupported",
+      "reason": "report scope: not supplied"
+    },
+    "radiusTopRight": {
+      "status": "unsupported",
+      "reason": "report scope: not supplied"
+    },
+    "radiusBottomRight": {
+      "status": "unsupported",
+      "reason": "report scope: not supplied"
+    },
+    "radiusBottomLeft": {
+      "status": "unsupported",
+      "reason": "report scope: not supplied"
+    },
+    "opacity": {
+      "status": "unsupported",
+      "reason": "report scope: not supplied"
+    }
+  },
+  "actual": {
+    "width": {
+      "status": "supported",
+      "kind": "px",
+      "value": 420
+    },
+    "height": {
+      "status": "supported",
+      "kind": "px",
+      "value": 588.5
+    },
+    "paddingTop": {
+      "status": "unsupported",
+      "reason": "report scope: not supplied"
+    },
+    "paddingRight": {
+      "status": "unsupported",
+      "reason": "report scope: not supplied"
+    },
+    "paddingBottom": {
+      "status": "unsupported",
+      "reason": "report scope: not supplied"
+    },
+    "paddingLeft": {
+      "status": "unsupported",
+      "reason": "report scope: not supplied"
+    },
+    "rowGap": {
+      "status": "unsupported",
+      "reason": "report scope: not supplied"
+    },
+    "columnGap": {
+      "status": "unsupported",
+      "reason": "report scope: not supplied"
+    },
+    "fontFamily": {
+      "status": "unsupported",
+      "reason": "report scope: not supplied"
+    },
+    "fontSize": {
+      "status": "unsupported",
+      "reason": "report scope: not supplied"
+    },
+    "fontWeight": {
+      "status": "unsupported",
+      "reason": "report scope: not supplied"
+    },
+    "lineHeight": {
+      "status": "unsupported",
+      "reason": "report scope: not supplied"
+    },
+    "letterSpacing": {
+      "status": "unsupported",
+      "reason": "report scope: not supplied"
+    },
+    "textColor": {
+      "status": "unsupported",
+      "reason": "report scope: not supplied"
+    },
+    "backgroundColor": {
+      "status": "unsupported",
+      "reason": "report scope: not supplied"
+    },
+    "borderTopWidth": {
+      "status": "supported",
+      "kind": "px",
+      "value": 0.666667
+    },
+    "borderRightWidth": {
+      "status": "supported",
+      "kind": "px",
+      "value": 0.666667
+    },
+    "borderBottomWidth": {
+      "status": "supported",
+      "kind": "px",
+      "value": 0.666667
+    },
+    "borderLeftWidth": {
+      "status": "supported",
+      "kind": "px",
+      "value": 0.666667
+    },
+    "borderTopColor": {
+      "status": "supported",
+      "kind": "rgba",
+      "value": [
+        222,
+        226,
+        230,
+        1
+      ]
+    },
+    "borderRightColor": {
+      "status": "supported",
+      "kind": "rgba",
+      "value": [
+        222,
+        226,
+        230,
+        1
+      ]
+    },
+    "borderBottomColor": {
+      "status": "supported",
+      "kind": "rgba",
+      "value": [
+        222,
+        226,
+        230,
+        1
+      ]
+    },
+    "borderLeftColor": {
+      "status": "supported",
+      "kind": "rgba",
+      "value": [
+        222,
+        226,
+        230,
+        1
+      ]
+    },
+    "radiusTopLeft": {
+      "status": "unsupported",
+      "reason": "report scope: not supplied"
+    },
+    "radiusTopRight": {
+      "status": "unsupported",
+      "reason": "report scope: not supplied"
+    },
+    "radiusBottomRight": {
+      "status": "unsupported",
+      "reason": "report scope: not supplied"
+    },
+    "radiusBottomLeft": {
+      "status": "unsupported",
+      "reason": "report scope: not supplied"
+    },
+    "opacity": {
+      "status": "unsupported",
+      "reason": "report scope: not supplied"
+    }
+  }
+}
