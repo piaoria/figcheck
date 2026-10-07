@@ -48,6 +48,12 @@ header #settings-button:focus-visible,header #help-button:focus-visible{outline:
 
 .action-icon{width:16px;height:16px;flex:none;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;vertical-align:middle}.action-control,.copy-label{display:inline-flex;align-items:center;justify-content:center;gap:6px}.app-footer{position:static;margin-top:20px;padding:12px 0 4px;border-top:1px solid var(--border);color:var(--muted);font-size:12px;line-height:18px}
 
+.shadow-section{margin:16px 0}.shadow-section h3{font-size:14px}.shadow-table{width:100%;table-layout:fixed}.shadow-table caption{text-align:left;color:var(--muted);padding:8px 0}.shadow-table th,.shadow-table td{overflow-wrap:anywhere;vertical-align:top}.shadow-value{font-variant-numeric:tabular-nums}.shadow-value .color-cell{display:flex;justify-content:flex-end;gap:6px;margin-top:6px}.shadow-details pre{white-space:pre-wrap;overflow-wrap:anywhere}.shadow-section p,.shadow-details p{font-size:12px;color:var(--muted)}
+
+.app-footer{display:flex;align-items:center;gap:7px}.brand-mark{display:block;width:20px;height:20px;flex:none;color:var(--muted)}
+
+.app-brand{display:flex;align-items:center;gap:6px;font-size:12px;line-height:20px;color:var(--muted);white-space:nowrap;flex:none}.app-brand .brand-mark{width:20px;height:20px}
+
 body{padding:16px;max-width:600px;margin:auto}header{display:flex;justify-content:flex-end;align-items:center;padding-bottom:12px;border-bottom:1px solid var(--border)}h1{font-size:16px;line-height:24px;font-weight:600;margin:0}#state-box{padding:16px 0 8px;min-height:72px}#state-title{font-weight:600;font-size:14px;line-height:20px;color:var(--text)}#status{font-size:13px;line-height:20px;margin:6px 0;overflow-wrap:anywhere;color:var(--muted)}body[data-state=error] #state-title,body[data-state=no-response] #state-title{color:var(--danger)}.actions{display:flex;gap:8px;flex-wrap:wrap}.feedback{font-size:12px;line-height:18px;color:var(--muted);overflow-wrap:anywhere}.feedback:empty{display:none}#property-summary{display:flex;gap:8px 16px;flex-wrap:wrap;font-size:12px;line-height:18px;color:var(--muted);margin:0 0 12px}#property-summary:empty{display:none}#primary-actions{display:flex;gap:8px;position:sticky;top:0;z-index:2;background:var(--bg);padding:8px 0 12px}#primary-actions #copy .copy-label{display:inline-flex}#primary-actions #copy{flex:1;margin:0;min-width:0;white-space:nowrap}#primary-actions #download{flex:none}#properties{margin-top:4px}.property-group{padding:0;margin:0;border-top:1px solid var(--border)}.property-group:first-child{border-top:0}.property-group>summary{display:flex;align-items:center;gap:8px;padding:12px 0;font-size:14px;line-height:20px;color:var(--text);font-weight:600;cursor:pointer}.property-group>summary:hover{color:var(--text)}.property-group>summary>.group-chevron{margin-left:auto}.property-group>summary>.group-count + .group-chevron{margin-left:0}.property-group>summary>.group-count{margin-left:auto;font-size:12px;line-height:18px;font-weight:400;color:var(--quiet)}.property-table{width:100%;border-collapse:collapse;font-size:13px;line-height:20px;table-layout:fixed}.property-table th,.property-table td{padding:8px 4px;border-top:1px solid var(--border);text-align:left;vertical-align:top;overflow-wrap:anywhere}.property-table th{word-break:keep-all;width:38%;font-weight:400;color:var(--muted)}.property-table td.value{width:43%;font-weight:500;font-variant-numeric:tabular-nums}.property-table td.value.numeric{text-align:right;padding-right:12px}.property-table td.support{width:19%;font-size:12px;line-height:18px;color:var(--muted)}.property-table .unavailable td{color:var(--quiet)}.property-table .unavailable small{display:block;font-size:12px;line-height:18px;font-weight:400;color:var(--muted);margin-top:4px}.property-table .swatch{display:inline-block;width:12px;height:12px;border:1px solid var(--quiet);border-radius:2px;margin-right:6px;vertical-align:middle}.property-table thead th{font-size:12px;color:var(--quiet);font-weight:400;padding:6px 4px}.property-table thead th:nth-child(2){width:43%;text-align:right;padding-right:12px}.property-table thead th:nth-child(3){width:19%}.secondary-actions{padding:12px 0}.secondary-actions button{font-size:12px}#json-preview{margin:8px 0 12px}#json-preview label{display:block;font-size:12px;color:var(--muted)}textarea{height:180px;width:100%;display:block;margin:8px 0 12px}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:12px/18px ui-monospace,Consolas,monospace;color:var(--muted);max-height:200px;overflow:auto;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius)}#diagnostics{border-top:1px solid var(--border);padding:12px 0;margin-top:8px}#diagnostics>summary{cursor:pointer;font-size:13px;color:var(--muted)}body[data-state=complete] #status{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 @media(max-width:350px){body{padding:12px}.property-table th{width:35%}.property-table td.value{width:43%}.property-table td.support{width:22%}.property-table thead th:nth-child(3){width:22%}.property-table th,.property-table td{padding-left:2px;padding-right:2px}.property-group>summary{font-size:14px}.property-group>summary span{font-size:12px}#primary-actions{gap:6px}}
 .property-group{margin:6px 0;border-top:0}.property-group>summary{min-height:42px;padding:10px 8px;background:var(--surface-raised);border-radius:4px;list-style:none;gap:10px}.property-group>summary::-webkit-details-marker{display:none}.property-group>summary::marker{content:''}.property-group>summary:hover{background:var(--hover)}.property-group>summary>.category-label{margin:0;font-size:14px;font-weight:600;color:var(--text)}.property-group>summary>.group-chevron{margin-left:auto}.property-group>summary>.group-count + .group-chevron{margin-left:0}.property-group>summary>.group-count{margin-left:auto;font-size:12px;white-space:nowrap}.property-group[open]>summary>.group-chevron{transform:rotate(90deg)}.property-table{margin-top:6px}@media(max-width:350px){.property-group>summary{gap:6px;padding:10px 6px}.property-group>summary>.category-label{gap:6px}.property-group>summary>.group-chevron{margin-left:auto}.property-group>summary>.group-count + .group-chevron{margin-left:0}.property-group>summary>.group-count{font-size:12px}}
@@ -55,7 +61,40 @@ body{padding:16px;max-width:600px;margin:auto}header{display:flex;justify-conten
 
 /* Figma-only right alignment: labels stay left; long color notation wraps inside the value group. */
 .property-table:not(.property-extra-table) th:first-child{width:38%}.property-table:not(.property-extra-table) td.value,.property-table:not(.property-extra-table) thead th:nth-child(2){width:62%}.property-table td.value:has(.color-cell){text-align:right;padding-right:12px}.color-cell{display:grid;grid-template-columns:minmax(0,1fr) 12px;align-items:center;gap:6px;min-width:0}.color-cell .swatch{grid-column:2;grid-row:1;margin:0}.color-cell .color-value{grid-column:1;grid-row:1;min-width:0;text-align:right;overflow-wrap:anywhere}.property-table td:has(.color-cell){vertical-align:middle}.property-table tr:has(.color-cell)>th{vertical-align:middle}.preview-color-row{grid-template-columns:minmax(0,.9fr) minmax(0,1.6fr);align-items:center}.preview-color-value{display:grid;grid-template-columns:minmax(0,1fr) 24px;align-items:center;gap:6px;min-width:0}.preview-color-value .preview-checker{grid-column:2;grid-row:1;width:24px;height:24px}.preview-color-value .color-value{grid-column:1;grid-row:1;min-width:0;text-align:right;font-size:12px;line-height:18px;overflow-wrap:anywhere}.preview-color-row>.preview-na{justify-self:end;text-align:right}
-</style></head><body data-state="connecting"><header><div class="toolbar"><button class="icon-button" type="button" data-theme-toggle aria-label="다크 테마" aria-pressed="false">라이트</button><button id="settings-button" class="icon-button" type="button" title="설정 열기" aria-label="설정 열기" aria-haspopup="dialog" aria-controls="settings-dialog" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m10 3-.5 2-2 .9-1.8-.7-2 3.4 1.5 1.4v2l-1.5 1.4 2 3.4 1.8-.7 2 .9.5 2h4l.5-2 2-.9 1.8.7 2-3.4-1.5-1.4v-2l1.5-1.4-2-3.4-1.8.7-2-.9-.5-2Z"/><circle cx="12" cy="11" r="3"/></svg></button><button id="help-button" class="icon-button" title="도움말 열기" type="button" aria-label="도움말 열기" aria-haspopup="dialog" aria-controls="help-dialog" aria-expanded="false">?</button></div></header><p id="theme-feedback" class="theme-feedback" role="status"></p><div id="state-box"><div id="state-title">Figma 연결 확인 중</div><p id="status" role="status">플러그인의 응답을 기다립니다.</p></div><p id="property-summary" class="meta"></p><div id="primary-actions"><button id="copy" aria-live="polite" aria-atomic="true" class="primary" disabled>JSON 복사</button><button id="download" class="secondary" disabled>파일 저장</button></div><section id="properties" aria-label="추출된 속성"></section><div class="actions secondary-actions"><button id="json-toggle" class="text-button" aria-controls="json-preview" aria-expanded="false" disabled>JSON 보기</button><button id="refresh" class="text-button" disabled>새로 추출</button><button id="close" class="text-button">닫기</button></div><section id="json-preview" hidden><label for="preview">선택한 노드의 JSON</label><textarea id="preview" readonly spellcheck="false" rows="7"></textarea><button id="manual-copy" class="secondary" hidden>선택한 JSON 직접 복사</button></section><p id="copy-status" class="feedback" role="status" aria-live="polite" aria-atomic="true"></p><main id="help-anchor"></main><dialog id="settings-dialog" aria-modal="true" aria-labelledby="settings-title"><div class="settings-heading"><h2 id="settings-title">설정</h2><button id="settings-close" type="button" aria-label="설정 닫기">닫기 <kbd>Esc</kbd></button></div><section class="format-setting"><h3>색상 표시</h3><div class="display-settings"><label for="color-format">색상 표기</label><select id="color-format"><option value="hex">HEX</option><option value="rgb" selected>RGB</option><option value="hsl">HSL</option></select></div><p id="color-feedback" class="theme-feedback" role="status"></p><p class="meta">표시 방식만 바뀝니다. 원본 RGBA·JSON는 유지합니다.</p></section></dialog><dialog id="help-dialog" aria-modal="true" aria-labelledby="help-title"><div class="help-heading"><h2 id="help-title">FigCheck 도움말</h2><div class="help-heading-controls"><button id="help-close" type="button" aria-label="도움말 닫기">닫기 <kbd>Esc</kbd></button></div></div><nav aria-label="도움말 항목"><a href="#help-start">처음 사용</a><a href="#help-json">JSON 전달</a><a href="#help-keys">단축키</a><a href="#help-limits">비교 범위</a></nav><section id="help-start"><h3>처음 사용</h3><ol><li>Figma에서 노드 하나를 선택하면 속성 표가 자동으로 나타납니다.</li><li>JSON 복사 → Chrome DevTools의 FigCheck에 붙여넣기 → 디자인 적용.</li><li>요소 선택으로 웹의 DOM 하나를 클릭합니다. Elements에서 선택한 $0도 사용합니다.</li></ol><p>디자인과 웹을 직접 각각 선택합니다. 자동 매칭은 없습니다. 완료된 입력은 요약으로 접히고 결과는 자동 갱신됩니다.</p></section><section id="help-json"><h3>JSON 전달</h3><p>파일 저장과 가져오기도 지원합니다. JSON schemaVersion은 1.0이며 앱 버전과 별개입니다. Figma는 한 노드를 내보내고, 여러 노드/nested JSON은 노드 목록에서 수동 선택합니다.</p><p>JSON 원문은 JSON 보기에서 확인합니다. 복사와 파일 저장은 표 화면에서 바로 가능합니다. 선택이 바뀌면 이전 표와 JSON은 즉시 무효화됩니다. 속성만 수정했다면 새로 추출합니다. 복사가 차단되면 다시 복사 또는 선택된 JSON에서 Ctrl+C를 사용하세요.</p><p>잘못된 붙여넣기는 기존 디자인을 유지합니다. 잘못된 파일도 기존 디자인을 유지합니다. 비우기는 로컬에 저장한 디자인을 삭제합니다. 분석 데이터는 외부로 전송하지 않습니다.</p></section><section id="help-keys"><h3>단축키</h3><dl><dt>Ctrl+Shift+X</dt><dd>DevTools가 열린 페이지에서 요소 선택 켜기/끄기. 다른 DevTools 탭에서도 시작하며 결과는 FigCheck 탭을 열어 확인합니다. 닫혀 있으면 툴바에 F12 안내가 나타납니다.</dd><dt>Esc</dt><dd>도움말을 닫거나 요소 선택을 취소합니다.</dd><dt>Ctrl+V / Ctrl+C</dt><dd>JSON 붙여넣기 / 복사. Mac에서는 ⌘를 사용합니다.</dd></dl><p>키 충돌은 chrome://extensions/shortcuts에서 확인합니다. OS 전역 단축키가 아닙니다.</p></section><section id="help-visual"><h3>속성 시각 비교</h3><p>크기·간격·테두리 도식, 색상 견본, 글꼴 속성 요약을 펼쳐 봅니다. 실제 크기는 숫자로 표시합니다. Border 안에 Padding을 중첩하고 Radius 값은 테두리의 네 모서리에 표시합니다. 중첩 영역은 비례·배율 도형이 아닌 기호이며 실제 UI를 재현하지 않습니다. 수치 버튼은 표의 속성 또는 추가 정보로 이동합니다.</p><p>N/A는 0이 아닙니다. 미지원·사용자 제외 이유는 추가 정보에서 확인합니다. Figma content는 stroke/layout 포함 정보가 없어 역산하지 않습니다. 웹 content는 모든 관련 값과 box-sizing·스크롤바 조건이 확인될 때만 계산합니다. margin은 생략하며 gap을 padding으로 대신하지 않습니다. 색상은 원본 alpha와 체크무늬를 유지하고 실제 폰트 예문은 렌더링하지 않습니다.</p></section><section id="help-limits"><h3>비교 범위</h3><p>크기, padding 4방향, row/column gap, 글꼴 5항목, 글자, 배경색, 테두리 4면 두께, 색, 모서리 4개 radius, 자체 opacity를 비교합니다. 하위 노드 전체, 그림자, blur, effects, 이미지, 배치는 분석하지 않습니다.</p><p>체크 해제는 사용자 제외, unknown은 추출 안 됨, unsupported는 미지원으로 표시합니다. 둘 다 점수 분모에서 빠지며 전부 제외하면 점수가 없습니다. 크기, 여백 ±1px, 글꼴 수치 ±0.5px, RGB 각 채널 ±1, alpha/opacity ±0.01의 기본 기준을 적용합니다. 미세 표현 오차는 별도 보정하며 원본은 유지합니다.</p><p>mixed, 복합 paint, gradient, 미해결 normal/auto/%/calc, transform/zoom 등은 속성별 이유를 표시합니다. 단일 HTML 요소만 선택하며 iframe/SVG/open Shadow 내부는 제한됩니다. CSS 규칙은 후보이고 cascade 승자, source line, Tailwind 원인을 추정하지 않습니다. 교차 출처 CSS는 접근이 제한될 수 있습니다.</p><p>실제 Figma 호스트와 OS 키의 Chrome command 이벤트는 아직 시험하지 않았습니다. Figma 화면 시험은 mock, Chrome 비교는 격리된 실제 확장 환경입니다.</p></section><section id="help-troubleshoot"><h3>연결, 오류 상세</h3><details id="diagnostics"><summary>연결 상태 ,  오류 상세</summary><pre id="details-text">UI 준비 중. 계속 이 상태라면 Figma 개발자 콘솔의 첫 오류를 확인하세요.</pre></details></section></dialog><footer class="app-footer">FigCheck · 0.3.7</footer><script>
+/* Compact Figma selection row; actions never shrink or wrap. */
+#state-box{display:flex;align-items:center;gap:8px;min-height:64px;padding:12px 0}
+#node-identity{flex:1;min-width:0}#state-title{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#primary-actions{position:static;flex:0 0 auto;flex-wrap:nowrap;gap:6px;padding:0;background:transparent}
+#primary-actions #copy{flex:none;width:108px;min-width:108px;padding:7px 8px}
+#primary-actions #download{flex:none;width:32px;min-width:32px;padding:7px;height:34px}
+body[data-state=complete] #status{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin:2px 0 0}
+/* Fixed peer sections: only the box diagram is a child of size. */
+#properties .property-group{margin:20px 0 0;padding:0;border-top:1px solid var(--border)}
+#properties .property-group>h2,#properties .shadow-section>h2{display:flex;align-items:center;gap:8px;margin:0;padding:12px 0 4px;font-size:14px;line-height:20px;font-weight:600;color:var(--text)}
+#properties .property-group>h2 .category-label{font:inherit;gap:8px}
+#properties .preview-static{margin:8px 0 12px;padding:0 0 0 8px;border-left:2px solid var(--border)}
+#properties .preview-static>h3{font-size:12px;line-height:18px;font-weight:500;color:var(--muted);margin:0 0 6px}
+#properties .preview-static>.preview-note{margin:4px 0 8px}
+#properties .shadow-section{margin:20px 0 12px;border-top:1px solid var(--border)}
+/* Dividers only at global toolbar and diagnostics boundaries, never between values. */
+#properties .property-group{margin-top:16px;border:0}
+#properties .property-group>h2,#properties .shadow-section>h2{padding-top:10px}
+#properties .property-table th,#properties .property-table td{border:0}
+#properties .preview-static{border:0;padding-left:8px;margin:6px 0 10px}
+#properties .preview-static .preview-side{border:0;padding:0;background:transparent}
+#properties .shadow-section{border:0;margin-top:16px}
+.app-footer{border:0;margin-top:16px;padding-top:10px}
+/* Subtle backgrounds on peer sections only; no nested cards or divider revival. */
+:root{--figma-section-bg:#f0f2f5}:root[data-theme=dark]{--figma-section-bg:#272b31}
+#property-main>.property-group,#property-main>.shadow-section{background:var(--figma-section-bg);padding:10px;border:0;border-radius:6px;box-shadow:none;margin:12px 0 0;min-width:0}
+#property-main>.property-group>h2,#property-main>.shadow-section>h2{padding:0 0 4px}
+#properties .preview-static{padding-left:0;background:transparent}
+header{justify-content:space-between;gap:8px}header .toolbar{flex:none}
+
+body:not([data-state=complete]) #primary-actions,body:not([data-state=complete]) #json-toggle{display:none}
+body:not([data-state=complete]):not([data-state=error]):not([data-state=no-response]) #refresh{display:none}
+body[data-state=empty-selection] #close,body[data-state=multiple-selection] #close{display:none}
+</style></head><body data-state="connecting"><header><div class="app-brand"><svg class="brand-mark" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path stroke="#cb6557" d="M6 13V10Q6 6 10 6H13"/><path stroke="#4b83c3" d="M19 6H22Q26 6 26 10V13"/><path stroke="#278d79" d="M26 19V22Q26 26 22 26H19"/><path stroke="#9a73b5" d="M13 26H10Q6 26 6 22V19"/><path d="m11 16 4 4 7-8"/></svg>FigCheck · 0.3.23</div><div class="toolbar"><button class="icon-button" type="button" data-theme-toggle aria-label="다크 테마" aria-pressed="false">라이트</button><button id="settings-button" class="icon-button" type="button" title="설정 열기" aria-label="설정 열기" aria-haspopup="dialog" aria-controls="settings-dialog" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m10 3-.5 2-2 .9-1.8-.7-2 3.4 1.5 1.4v2l-1.5 1.4 2 3.4 1.8-.7 2 .9.5 2h4l.5-2 2-.9 1.8.7 2-3.4-1.5-1.4v-2l1.5-1.4-2-3.4-1.8.7-2-.9-.5-2Z"/><circle cx="12" cy="11" r="3"/></svg></button><button id="help-button" class="icon-button" title="도움말 열기" type="button" aria-label="도움말 열기" aria-haspopup="dialog" aria-controls="help-dialog" aria-expanded="false">?</button></div></header><p id="theme-feedback" class="theme-feedback" role="status"></p><div id="state-box"><div id="node-identity"><div id="state-title">Figma 연결 확인 중</div><p id="status" role="status">플러그인의 응답을 기다립니다.</p></div><div id="primary-actions"><button id="copy" aria-live="polite" aria-atomic="true" class="primary" disabled>JSON 복사</button><button id="download" class="secondary" disabled>파일 저장</button></div></div><p id="property-summary" class="meta"></p><section id="properties" aria-label="추출된 속성"></section><div class="actions secondary-actions"><button id="json-toggle" class="text-button" aria-controls="json-preview" aria-expanded="false" disabled>JSON 보기</button><button id="refresh" class="text-button" disabled>새로 추출</button><button id="close" class="text-button">닫기</button></div><section id="json-preview" hidden><label for="preview">선택한 노드의 JSON</label><textarea id="preview" readonly spellcheck="false" rows="7"></textarea><button id="manual-copy" class="secondary" hidden>선택한 JSON 직접 복사</button></section><p id="copy-status" class="feedback" role="status" aria-live="polite" aria-atomic="true"></p><main id="help-anchor"></main><dialog id="settings-dialog" aria-modal="true" aria-labelledby="settings-title"><div class="settings-heading"><h2 id="settings-title">설정</h2><button id="settings-close" type="button" aria-label="설정 닫기">닫기 <kbd>Esc</kbd></button></div><section class="format-setting"><h3>색상 표시</h3><div class="display-settings"><label for="color-format">색상 표기</label><select id="color-format"><option value="hex">HEX</option><option value="rgb" selected>RGB</option><option value="hsl">HSL</option></select></div><p id="color-feedback" class="theme-feedback" role="status"></p><p class="meta">표시 방식만 바뀝니다. 원본 RGBA·JSON는 유지합니다.</p></section></dialog><dialog id="help-dialog" aria-modal="true" aria-labelledby="help-title"><div class="help-heading"><h2 id="help-title">FigCheck 도움말</h2><div class="help-heading-controls"><button id="help-close" type="button" aria-label="도움말 닫기">닫기 <kbd>Esc</kbd></button></div></div><nav aria-label="도움말 항목"><a href="#help-start">처음 사용</a><a href="#help-json">JSON 전달</a><a href="#help-keys">단축키</a><a href="#help-limits">비교 범위</a></nav><section id="help-start"><h3>처음 사용</h3><ol><li>Figma에서 노드 하나를 선택하면 속성 표가 자동으로 나타납니다.</li><li>JSON 복사 → Chrome DevTools의 FigCheck에 붙여넣기 → 디자인 적용.</li><li>요소 선택으로 웹의 DOM 하나를 클릭합니다. Elements에서 선택한 $0도 사용합니다.</li></ol><p>디자인과 웹을 직접 각각 선택합니다. 자동 매칭은 없습니다. 완료된 입력은 요약으로 접히고 결과는 자동 갱신됩니다.</p></section><section id="help-json"><h3>JSON 전달</h3><p>파일 저장과 가져오기도 지원합니다. JSON schemaVersion은 1.0이며 앱 버전과 별개입니다. Figma는 한 노드를 내보내고, 여러 노드/nested JSON은 노드 목록에서 수동 선택합니다.</p><p>JSON 원문은 JSON 보기에서 확인합니다. 복사와 파일 저장은 표 화면에서 바로 가능합니다. 선택이 바뀌면 이전 표와 JSON은 즉시 무효화됩니다. 속성만 수정했다면 새로 추출합니다. 복사가 차단되면 다시 복사 또는 선택된 JSON에서 Ctrl+C를 사용하세요.</p><p>잘못된 붙여넣기는 기존 디자인을 유지합니다. 잘못된 파일도 기존 디자인을 유지합니다. 비우기는 로컬에 저장한 디자인을 삭제합니다. 분석 데이터는 외부로 전송하지 않습니다.</p></section><section id="help-keys"><h3>단축키</h3><dl><dt>Ctrl+Shift+X</dt><dd>DevTools가 열린 페이지에서 요소 선택 켜기/끄기. 다른 DevTools 탭에서도 시작하며 결과는 FigCheck 탭을 열어 확인합니다. 닫혀 있으면 툴바에 F12 안내가 나타납니다.</dd><dt>↑ / ↓</dt><dd>요소 선택 중 부모 / 이전 자식 탐색. Alt+휠을 포함한 휠 입력은 페이지 스크롤에 그대로 전달합니다. 같은 요소 위의 포인터 이동은 깊이를 유지합니다. 클릭 또는 Enter로 확정합니다. 입력 필드에 포커스가 있으면 방향키·Enter는 입력에 사용합니다.</dd><dt>Esc</dt><dd>도움말을 닫거나 요소 선택을 취소합니다.</dd><dt>Ctrl+V / Ctrl+C</dt><dd>JSON 붙여넣기 / 복사. Mac에서는 ⌘를 사용합니다.</dd></dl><p>키 충돌은 chrome://extensions/shortcuts에서 확인합니다. OS 전역 단축키가 아닙니다.</p></section><section id="help-visual"><h3>속성 시각 비교</h3><p>크기·간격·테두리 도식, 색상 견본, 글꼴 속성 요약을 펼쳐 봅니다. 실제 크기는 숫자로 표시합니다. Border 안에 Padding을 중첩하고 Radius 값은 테두리의 네 모서리에 표시합니다. 중첩 영역은 비례·배율 도형이 아닌 기호이며 실제 UI를 재현하지 않습니다. 수치 버튼은 표의 속성 또는 추가 정보로 이동합니다.</p><p>N/A는 0이 아닙니다. 미지원·사용자 제외 이유는 추가 정보에서 확인합니다. Figma content는 stroke/layout 포함 정보가 없어 역산하지 않습니다. 웹 content는 모든 관련 값과 box-sizing·스크롤바 조건이 확인될 때만 계산합니다. margin은 생략하며 gap을 padding으로 대신하지 않습니다. 색상은 원본 alpha와 체크무늬를 유지하고 실제 폰트 예문은 렌더링하지 않습니다.</p></section><section id="help-limits"><h3>비교 범위</h3><p>크기, padding 4방향, row/column gap, 글꼴 5항목, 글자, 배경색, 테두리 4면 두께, 색, 모서리 4개 radius, 자체 opacity를 비교합니다. 일반 박스 그림자는 Inspect CSS 근거가 있는 NORMAL 외부/내부 효과만 비교합니다. 하위 노드 전체, layer/background blur, filter, 이미지, 배치는 분석하지 않습니다.</p><p>체크 해제는 사용자 제외, unknown은 추출 안 됨, unsupported는 미지원으로 표시합니다. 둘 다 점수 분모에서 빠지며 전부 제외하면 점수가 없습니다. 크기, 여백 ±1px, 글꼴 수치 ±0.5px, RGB 각 채널 ±1, alpha/opacity ±0.01의 기본 기준을 적용합니다. 미세 표현 오차는 별도 보정하며 원본은 유지합니다.</p><p>mixed, 복합 paint, gradient, 미해결 normal/auto/%/calc, transform/zoom 등은 속성별 이유를 표시합니다. 단일 HTML 요소만 선택하며 iframe/SVG/open Shadow 내부는 제한됩니다. CSS 규칙은 후보이고 cascade 승자, source line, Tailwind 원인을 추정하지 않습니다. 교차 출처 CSS는 접근이 제한될 수 있습니다.</p><p>실제 Figma 호스트와 OS 키의 Chrome command 이벤트는 아직 시험하지 않았습니다. Figma 화면 시험은 mock, Chrome 비교는 격리된 실제 확장 환경입니다.</p></section><section id="help-troubleshoot"><h3>연결, 오류 상세</h3><details id="diagnostics"><summary>연결 상태 ,  오류 상세</summary><pre id="details-text">UI 준비 중. 계속 이 상태라면 Figma 개발자 콘솔의 첫 오류를 확인하세요.</pre></details></section></dialog><script>
 // A separate small bootstrap can report a bundle parse/startup error before UI listeners exist.
 window.addEventListener('error',function(event){var title=document.getElementById('state-title');var text=document.getElementById('status');var info=document.getElementById('details-text');var button=document.getElementById('download');if(title)title.textContent='UI 실행 오류';if(text)text.textContent='플러그인을 닫고 dist manifest로 다시 실행해주세요. 아래 오류 상세를 확인할 수 있습니다.';if(info)info.textContent=String(event.message)+' ,  '+String(event.filename)+':'+String(event.lineno);if(button)button.disabled=true;var copy=document.getElementById('copy');if(copy)copy.disabled=true;document.body.setAttribute('data-state','error');});
 </script><script>"use strict";
@@ -86,10 +125,10 @@ window.addEventListener('error',function(event){var title=document.getElementByI
     svg2.append(path2);
     return svg2;
   }
-  function setAction(button, action, text = button.textContent, title2 = text) {
+  function setAction(button, action, text2 = button.textContent, title2 = text2) {
     button.classList.add("action-control");
     button.title = title2;
-    button.replaceChildren(actionIcon(action), document.createTextNode(text));
+    button.replaceChildren(actionIcon(action), document.createTextNode(text2));
   }
 
   // packages/ui/color.ts
@@ -97,9 +136,9 @@ window.addEventListener('error',function(event){var title=document.getElementByI
     return value === "hex" || value === "rgb" || value === "hsl";
   }
   var decimal = (value, digits) => value !== 0 && Math.abs(value) < 10 ** -digits ? String(Number(value.toPrecision(3))) : String(Number(value.toFixed(digits)));
-  function formatColor(rgba2, format) {
-    if (rgba2.length !== 4 || rgba2.some((v, i) => !Number.isFinite(v) || v < 0 || v > (i === 3 ? 1 : 255))) return "\uAC12 \uC624\uB958";
-    const [red, green, blue, alpha] = rgba2;
+  function formatColor(rgba3, format) {
+    if (rgba3.length !== 4 || rgba3.some((v, i) => !Number.isFinite(v) || v < 0 || v > (i === 3 ? 1 : 255))) return "\uAC12 \uC624\uB958";
+    const [red, green, blue, alpha] = rgba3;
     if (format === "hex") {
       const hex = (value) => Math.round(value).toString(16).padStart(2, "0").toUpperCase();
       return "#" + [red, green, blue].map(hex).join("") + (alpha === 1 ? "" : hex(alpha * 255));
@@ -120,19 +159,19 @@ window.addEventListener('error',function(event){var title=document.getElementByI
   // packages/ui/color-display.ts
   var current = "rgb";
   var currentColorFormat = () => current;
-  function update(node, rgba2) {
-    const text = formatColor(rgba2, current);
-    if (node.classList.contains("color-value")) node.textContent = text;
-    node.title = text + " \xB7 \uC6D0\uBCF8 RGBA " + JSON.stringify(rgba2);
+  function update(node, rgba3) {
+    const text2 = formatColor(rgba3, current);
+    if (node.classList.contains("color-value")) node.textContent = text2;
+    node.title = text2 + " \xB7 \uC6D0\uBCF8 RGBA " + JSON.stringify(rgba3);
   }
-  function bindColor(node, rgba2) {
-    node.dataset.rgba = JSON.stringify(rgba2);
-    update(node, rgba2);
+  function bindColor(node, rgba3) {
+    node.dataset.rgba = JSON.stringify(rgba3);
+    update(node, rgba3);
   }
-  function colorValue(rgba2) {
+  function colorValue(rgba3) {
     const span = document.createElement("span");
     span.className = "color-value";
-    bindColor(span, rgba2);
+    bindColor(span, rgba3);
     return span;
   }
   function initializeColorFormat(save) {
@@ -195,6 +234,104 @@ window.addEventListener('error',function(event){var title=document.getElementByI
         if (savedRevision === revision2) feedback.textContent = failed ? "\uD14C\uB9C8\uB97C \uC800\uC7A5\uD558\uC9C0 \uBABB\uD588\uC5B4\uC694. \uC774\uBC88 \uCC3D\uC5D0\uB294 \uC801\uC6A9\uB3FC\uC694." : "";
       }
     };
+  }
+
+  // packages/ui/format.ts
+  function formatNumber(value) {
+    if (!Number.isFinite(value)) return "\uAC12 \uBBF8\uD655\uC778";
+    if (value === 0) return "0";
+    if (Math.abs(value) < 1e-3) return String(Number(value.toPrecision(3)));
+    return String(Number(value.toFixed(3)));
+  }
+  function valueText(v) {
+    if (v.status !== "supported") return v.status === "unsupported" ? "\uBBF8\uC9C0\uC6D0" : "\uAC12 \uBBF8\uD655\uC778";
+    if (v.kind === "rgba") return formatColor(v.value, currentColorFormat());
+    return `${typeof v.value === "number" ? formatNumber(v.value) : v.value}${v.kind === "px" ? " px" : ""}`;
+  }
+
+  // packages/ui/shadow-view.ts
+  var el = (tag, text2) => {
+    const n = document.createElement(tag);
+    if (text2 !== void 0) n.textContent = text2;
+    return n;
+  };
+  function heading() {
+    const h = el("h3");
+    const icon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    icon.setAttribute("viewBox", "0 0 24 24");
+    icon.setAttribute("aria-hidden", "true");
+    icon.style.cssText = "width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.5;vertical-align:middle;margin-right:6px";
+    const p = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    p.setAttribute("d", "M4 4h12v12H4z M8 19h11V8");
+    icon.append(p);
+    h.append(icon, document.createTextNode("\uADF8\uB9BC\uC790"));
+    return h;
+  }
+  function layerCell(layer) {
+    const cell = el("td");
+    cell.className = "shadow-value";
+    if (!layer) {
+      cell.textContent = "\uC5C6\uC74C";
+      return cell;
+    }
+    cell.append(el("span", `${layer.inset ? "\uB0B4\uBD80" : "\uC678\uBD80"} ${layer.index + 1}`), el("div", `X ${formatNumber(layer.x)} \xB7 Y ${formatNumber(layer.y)} \xB7 Blur ${formatNumber(layer.blur)} \xB7 Spread ${formatNumber(layer.spread)} px`));
+    const pair = el("span");
+    pair.className = "color-cell";
+    const swatch = el("span");
+    swatch.className = "swatch";
+    swatch.setAttribute("aria-hidden", "true");
+    swatch.style.backgroundColor = `rgba(${layer.color.join(",")})`;
+    bindColor(swatch, layer.color);
+    pair.append(swatch, colorValue(layer.color));
+    cell.append(pair);
+    return cell;
+  }
+  function shadowValues(s) {
+    const section = el("section");
+    section.className = "shadow-section";
+    section.append(heading());
+    if (s?.status === "supported") {
+      if (!s.layers.length) section.append(el("p", "\uC5C6\uC74C"));
+      else {
+        section.append(el("p", "Figma Inspect CSS \uBE44\uAD50\uAC12 \xB7 \uC790\uC2DD \uD569\uC131\uC758 \uC2DC\uAC01\uC801 \uC77C\uCE58\uB294 \uAC80\uC99D\uD558\uC9C0 \uC54A\uC2B5\uB2C8\uB2E4."));
+        const table = el("table");
+        table.className = "property-table shadow-table";
+        const body = el("tbody");
+        for (const layer of s.layers) {
+          const row = el("tr");
+          row.append(layerCell(layer));
+          body.append(row);
+        }
+        table.append(body);
+        section.append(table);
+      }
+    } else {
+      section.append(el("p", s?.status === "unsupported" ? "\uBE44\uAD50 \uBD88\uAC00" : "\uBBF8\uC218\uC9D1 \xB7 \uBE44\uAD50\uAC12 \uD655\uC778 \uBD88\uAC00"), el("p", s?.reason ?? "\uADF8\uB9BC\uC790 \uB370\uC774\uD130 \uBBF8\uC218\uC9D1 (\uAD6C\uBC84\uC804 JSON \uB610\uB294 effects \uC5C6\uC74C)"));
+    }
+    const raw = s?.effects?.filter((e) => e.type === "DROP_SHADOW" || e.type === "INNER_SHADOW") ?? [];
+    if (raw.length && s?.status !== "supported") {
+      section.append(el("p", "Figma \uC6D0\uBCF8 effects \xB7 Radius\uB294 CSS Blur \uBE44\uAD50\uAC12\uC774 \uC544\uB2D9\uB2C8\uB2E4."));
+      const table = el("table");
+      table.className = "property-table shadow-raw-table";
+      const body = el("tbody");
+      for (const effect of raw) {
+        const row = el("tr"), cell = el("td");
+        cell.append(el("div", `${effect.type === "INNER_SHADOW" ? "\uB0B4\uBD80" : "\uC678\uBD80"} ${effect.index + 1}${effect.visible ? "" : " \xB7 \uC228\uAE40"}`), el("div", `X ${effect.x} \xB7 Y ${effect.y} \xB7 Radius ${effect.radius} \xB7 Spread ${effect.spread} px`));
+        if (effect.color) cell.append(el("div", `RGBA [${effect.color.join(", ")}]`));
+        cell.append(el("div", `Blend ${effect.blendMode ?? "\uBBF8\uC218\uC9D1"}`));
+        row.append(cell);
+        body.append(row);
+      }
+      table.append(body);
+      section.append(table);
+    }
+    return section;
+  }
+  function shadowDetails(s) {
+    const d = el("details");
+    d.className = "shadow-details";
+    d.append(el("summary", "\uADF8\uB9BC\uC790 \xB7 \uCD94\uAC00 \uC815\uBCF4"), el("p", s.reason ?? "Figma \uC6D0\uBCF8 effects \uBC0F CSS \uB300\uC751 \uADFC\uAC70"), el("pre", JSON.stringify({ effects: s.effects, css: s.css, mapping: s.mapping }, null, 2)));
+    return d;
   }
 
   // packages/ui/properties.ts
@@ -285,24 +422,51 @@ window.addEventListener('error',function(event){var title=document.getElementByI
   function propertyLabel(key) {
     const wrap = document.createElement("span");
     wrap.className = "property-label";
-    const text = document.createElement("span");
-    text.className = "property-label-text";
-    text.textContent = labels[key];
-    wrap.append(propertyIcon(key), text);
+    const text2 = document.createElement("span");
+    text2.className = "property-label-text";
+    text2.textContent = labels[key];
+    wrap.append(propertyIcon(key), text2);
     return wrap;
   }
 
-  // packages/ui/format.ts
-  function formatNumber(value) {
-    if (!Number.isFinite(value)) return "\uAC12 \uBBF8\uD655\uC778";
-    if (value === 0) return "0";
-    if (Math.abs(value) < 1e-3) return String(Number(value.toPrecision(3)));
-    return String(Number(value.toFixed(3)));
+  // packages/core/src/shadows.ts
+  var record = (x) => typeof x === "object" && x !== null && !Array.isArray(x);
+  var num = (x) => typeof x === "number" && Number.isFinite(x) && Math.abs(x) <= 1e7;
+  var rgba = (x) => Array.isArray(x) && x.length === 4 && x.every((n, i) => num(n) && n >= 0 && n <= (i === 3 ? 1 : 255));
+  function requireValue(ok) {
+    if (!ok) throw new Error("\uADF8\uB9BC\uC790 \uC2A4\uD0A4\uB9C8/\uAC12 \uC624\uB958");
   }
-  function valueText(v) {
-    if (v.status !== "supported") return v.status === "unsupported" ? "\uBBF8\uC9C0\uC6D0" : "\uAC12 \uBBF8\uD655\uC778";
-    if (v.kind === "rgba") return formatColor(v.value, currentColorFormat());
-    return `${typeof v.value === "number" ? formatNumber(v.value) : v.value}${v.kind === "px" ? " px" : ""}`;
+  function fields(x, allowed) {
+    requireValue(Object.keys(x).every((k) => allowed.includes(k)));
+  }
+  var text = (x) => typeof x === "string" && x.length > 0 && x.length <= 8192;
+  function validateShadows(value) {
+    requireValue(record(value));
+    fields(value, ["version", "status", "layers", "reason", "css", "effects", "mapping"]);
+    requireValue(value.version === 1 && ["supported", "unsupported", "unknown"].includes(String(value.status)));
+    requireValue(Array.isArray(value.layers) && value.layers.length <= 32);
+    if (value.status !== "supported") requireValue(text(value.reason));
+    if ("reason" in value) requireValue(text(value.reason));
+    if ("css" in value) requireValue(text(value.css));
+    if ("mapping" in value) requireValue(value.mapping === "computed" || value.mapping === "getCSSAsync");
+    value.layers.forEach((l, i) => {
+      requireValue(record(l));
+      fields(l, ["index", "effectIndex", "inset", "x", "y", "blur", "spread", "color"]);
+      requireValue(l.index === i && typeof l.inset === "boolean" && num(l.x) && num(l.y) && num(l.blur) && Number(l.blur) >= 0 && num(l.spread) && rgba(l.color));
+      if ("effectIndex" in l) requireValue(Number.isInteger(l.effectIndex) && Number(l.effectIndex) >= 0 && Number(l.effectIndex) < 64);
+    });
+    if ("effects" in value) {
+      requireValue(Array.isArray(value.effects) && value.effects.length <= 64);
+      value.effects.forEach((e, i) => {
+        requireValue(record(e));
+        fields(e, ["index", "type", "visible", "x", "y", "radius", "spread", "color", "blendMode", "showShadowBehindNode"]);
+        requireValue(e.index === i && text(e.type) && typeof e.visible === "boolean");
+        for (const k of ["x", "y", "radius", "spread"]) if (k in e) requireValue(num(e[k]) && (k !== "radius" || Number(e[k]) >= 0));
+        if ("color" in e) requireValue(rgba(e.color));
+        if ("blendMode" in e) requireValue(text(e.blendMode));
+        if ("showShadowBehindNode" in e) requireValue(typeof e.showShadowBehindNode === "boolean");
+      });
+    }
   }
 
   // packages/core/src/index.ts
@@ -324,7 +488,7 @@ window.addEventListener('error',function(event){var title=document.getElementByI
     if (key === "fontWeight" || key === "opacity") return "number";
     return "px";
   }
-  var record = (v) => typeof v === "object" && v !== null && !Array.isArray(v);
+  var record2 = (v) => typeof v === "object" && v !== null && !Array.isArray(v);
   function assert(condition, message) {
     if (!condition) throw new Error(message);
   }
@@ -335,11 +499,11 @@ window.addEventListener('error',function(event){var title=document.getElementByI
     assert(Object.keys(v).every((k) => allowed.includes(k)), `${path2}: \uC54C \uC218 \uC5C6\uB294 \uD0A4 \uB610\uB294 \uC704\uD5D8\uD55C \uD0A4`);
   }
   function validateProperties(v) {
-    assert(record(v), "properties \uAC1D\uCCB4 \uD544\uC694");
+    assert(record2(v), "properties \uAC1D\uCCB4 \uD544\uC694");
     exactKeys(v, keys, "properties");
     for (const key of keys) {
       const p = v[key];
-      assert(record(p), `${key}: \uBA85\uC2DC\uC801 status \uD544\uC694`);
+      assert(record2(p), `${key}: \uBA85\uC2DC\uC801 status \uD544\uC694`);
       if (p.status === "supported") {
         exactKeys(p, ["status", "kind", "value", "note"], key);
         assert(p.kind === kindFor(key), `${key}: \uC18D\uC131\uC5D0 \uB9DE\uB294 kind \uD544\uC694`);
@@ -359,10 +523,10 @@ window.addEventListener('error',function(event){var title=document.getElementByI
       }
     }
   }
-  function parseDesign(text) {
-    assert(text.length <= 1024 * 1024, "JSON \uCD5C\uB300 1 MiB");
-    const doc2 = JSON.parse(text);
-    assert(record(doc2), "\uBB38\uC11C \uAC1D\uCCB4 \uD544\uC694");
+  function parseDesign(text2) {
+    assert(text2.length <= 1024 * 1024, "JSON \uCD5C\uB300 1 MiB");
+    const doc2 = JSON.parse(text2);
+    assert(record2(doc2), "\uBB38\uC11C \uAC1D\uCCB4 \uD544\uC694");
     exactKeys(doc2, ["schemaVersion", "source", "exportedAt", "colorProfile", "nodes"], "document");
     assert(doc2.schemaVersion === VERSION, "\uC9C0\uC6D0 schemaVersion\uC740 1.0\uC785\uB2C8\uB2E4. \uC784\uC758\uC758 \uAD6C\uD615 JSON\uC740 \uC790\uB3D9 \uBCC0\uD658\uD558\uC9C0 \uC54A\uC2B5\uB2C8\uB2E4.");
     assert(doc2.source === "figma", "source\uB294 figma\uC5EC\uC57C \uD569\uB2C8\uB2E4");
@@ -374,14 +538,15 @@ window.addEventListener('error',function(event){var title=document.getElementByI
     const ids = /* @__PURE__ */ new Set();
     function node(v, depth) {
       assert(++count <= 256 && depth <= 16, "\uB178\uB4DC \uCD5C\uB300 256\uAC1C / \uAE4A\uC774 \uCD5C\uB300 16");
-      assert(record(v), "node \uAC1D\uCCB4 \uD544\uC694");
-      exactKeys(v, ["id", "name", "type", "properties", "children"], "node");
+      assert(record2(v), "node \uAC1D\uCCB4 \uD544\uC694");
+      exactKeys(v, ["id", "name", "type", "properties", "children", "shadows"], "node");
       boundedText(v.id, "id");
       boundedText(v.name, "name");
       boundedText(v.type, "type");
       assert(!ids.has(v.id), "\uC911\uBCF5 node id");
       ids.add(v.id);
       validateProperties(v.properties);
+      if ("shadows" in v) validateShadows(v.shadows);
       if ("children" in v) {
         assert(Array.isArray(v.children), "children \uBC30\uC5F4 \uD544\uC694");
         v.children.forEach((c) => node(c, depth + 1));
@@ -391,6 +556,7 @@ window.addEventListener('error',function(event){var title=document.getElementByI
     if (doc2.colorProfile === "DISPLAY_P3" || doc2.colorProfile === "UNKNOWN") {
       const excludeColors = (n) => {
         for (const k of keys.filter((k2) => k2.endsWith("Color"))) n.properties[k] = unavailable(`Figma ${doc2.colorProfile} \uC0C9\uACF5\uAC04: sRGB \uBCC0\uD658 \uBBF8\uC9C0\uC6D0`);
+        if (n.shadows) n.shadows = { ...n.shadows, status: "unsupported", reason: "Figma \uC0C9\uACF5\uAC04 sRGB \uBCC0\uD658 \uBBF8\uC9C0\uC6D0" };
         n.children?.forEach(excludeColors);
       };
       doc2.nodes.forEach(excludeColors);
@@ -403,7 +569,7 @@ window.addEventListener('error',function(event){var title=document.getElementByI
   function px(value) {
     return value.status === "supported" && value.kind === "px" && typeof value.value === "number" && Number.isFinite(value.value) && value.value >= 0 ? value.value : void 0;
   }
-  function rgba(value) {
+  function rgba2(value) {
     return value.status === "supported" && value.kind === "rgba" && Array.isArray(value.value) && value.value.length === 4 && value.value.every((n, i) => typeof n === "number" && Number.isFinite(n) && n >= 0 && n <= (i === 3 ? 1 : 255)) ? value.value : void 0;
   }
   function contentSize(p, source, css) {
@@ -420,9 +586,9 @@ window.addEventListener('error',function(event){var title=document.getElementByI
 
   // packages/ui/visual-preview.ts
   var state = /* @__PURE__ */ new Map();
-  var el = (tag, text, cls) => {
+  var el2 = (tag, text2, cls) => {
     const n = document.createElement(tag);
-    if (text !== void 0) n.textContent = text;
+    if (text2 !== void 0) n.textContent = text2;
     if (cls) n.className = cls;
     return n;
   };
@@ -437,25 +603,25 @@ window.addEventListener('error',function(event){var title=document.getElementByI
     details.id = id;
     details.className = "property-preview";
     details.open = state.get(id) ?? kind === "structure";
-    const summary = el("summary", kind === "structure" ? "\uAD6C\uC870" : kind === "color" ? "\uC0C9\uC0C1 \uBBF8\uB9AC\uBCF4\uAE30" : "\uAE00\uAF34 \uBBF8\uB9AC\uBCF4\uAE30");
+    const summary = el2("summary", kind === "structure" ? "\uAD6C\uC870" : kind === "color" ? "\uC0C9\uC0C1 \uBBF8\uB9AC\uBCF4\uAE30" : "\uAE00\uAF34 \uBBF8\uB9AC\uBCF4\uAE30");
     summary.id = id + "-summary";
     details.append(summary);
     summary.addEventListener("click", () => state.set(id, !details.open));
     details.addEventListener("toggle", () => {
       if (details.isConnected) state.set(id, details.open);
     });
-    const note = el("p", kind === "structure" ? "\uC2E4\uC81C \uD06C\uAE30\uB294 \uC218\uCE58\uB85C \uD45C\uC2DC\uD569\uB2C8\uB2E4. \uC911\uCCA9 \uC601\uC5ED\uC740 \uAE30\uD638\uC774\uBA70 \uD06C\uAE30\xB7\uB450\uAED8\xB7\uB0B4\uBD80 \uC5EC\uBC31\uC740 \uBE44\uB840\uD558\uC9C0 \uC54A\uC2B5\uB2C8\uB2E4. margin\uC740 \uC0DD\uB7B5, gap\uC740 \uBCC4\uB3C4 \uAC12\uC785\uB2C8\uB2E4." : "\uC6D0\uBCF8 \uAC12 \uC694\uC57D \xB7 \uBE44\uAD50\uC5D0\uC11C \uD655\uC778\uB41C \uCC28\uC774\uB9CC \uAC15\uC870", "preview-note");
+    const note = el2("p", kind === "structure" ? "\uC2E4\uC81C \uD06C\uAE30\uB294 \uC218\uCE58\uB85C \uD45C\uC2DC\uD569\uB2C8\uB2E4. \uC911\uCCA9 \uC601\uC5ED\uC740 \uAE30\uD638\uC774\uBA70 \uD06C\uAE30\xB7\uB450\uAED8\xB7\uB0B4\uBD80 \uC5EC\uBC31\uC740 \uBE44\uB840\uD558\uC9C0 \uC54A\uC2B5\uB2C8\uB2E4. margin\uC740 \uC0DD\uB7B5, gap\uC740 \uBCC4\uB3C4 \uAC12\uC785\uB2C8\uB2E4." : "\uC6D0\uBCF8 \uAC12 \uC694\uC57D \xB7 \uBE44\uAD50\uC5D0\uC11C \uD655\uC778\uB41C \uCC28\uC774\uB9CC \uAC15\uC870", "preview-note");
     details.append(note);
-    const wrap = el("div", void 0, "preview-sides");
+    const wrap = el2("div", void 0, "preview-sides");
     details.append(wrap);
     function metric(key, v, source, compact = false) {
-      const b = el("button", void 0, "preview-metric");
+      const b = el2("button", void 0, "preview-metric");
       b.type = "button";
       b.id = id + "-" + source + "-" + key;
       b.dataset.previewKey = key;
       const name = labels[key] + ": " + shown(v);
       b.setAttribute("aria-label", name);
-      b.append(propertyIcon(key), el("span", compact ? shown(v) : name, "preview-value"));
+      b.append(propertyIcon(key), el2("span", compact ? shown(v) : name, "preview-value"));
       b.title = name + " \xB7 " + (v.status === "supported" ? v.note ?? "\uC18D\uC131 \uD589\uC73C\uB85C \uC774\uB3D9" : na(v));
       if (status2(key) === "mismatch") b.classList.add("preview-difference");
       if (v.status !== "supported") b.classList.add("preview-na");
@@ -463,19 +629,19 @@ window.addEventListener('error',function(event){var title=document.getElementByI
       return b;
     }
     for (const side of sides) {
-      const p = side.properties, card = el("section", void 0, "preview-side");
+      const p = side.properties, card = el2("section", void 0, "preview-side");
       card.dataset.source = side.source;
-      card.append(el("h3", side.title));
+      card.append(el2("h3", side.title));
       wrap.append(card);
       if (kind === "structure") {
         let corners2 = function(keys2) {
-          const row = el("div", void 0, "corner-row");
+          const row = el2("div", void 0, "corner-row");
           for (const key of keys2) row.append(metric(key, p[key], side.source, true));
           return row;
         }, region2 = function(name, cls, keys2, center2) {
-          const box2 = el("div", void 0, "box-region " + cls);
+          const box2 = el2("div", void 0, "box-region " + cls);
           box2.dataset.region = cls;
-          box2.append(el("span", name, "region-label"));
+          box2.append(el2("span", name, "region-label"));
           for (const [i, key] of keys2.entries()) {
             const button = metric(key, p[key], side.source, true);
             button.dataset.position = ["top", "right", "bottom", "left"][i];
@@ -486,10 +652,10 @@ window.addEventListener('error',function(event){var title=document.getElementByI
         };
         var corners = corners2, region = region2;
         const w = px(p.width), h = px(p.height);
-        const map = el("div", void 0, "box-map");
+        const map = el2("div", void 0, "box-map");
         map.setAttribute("aria-label", side.title + " \uD14C\uB450\uB9AC\xB7\uB0B4\uBD80 \uC5EC\uBC31\xB7\uBAA8\uC11C\uB9AC \uC18D\uC131");
-        const center = el("div", void 0, "box-center");
-        const dimensions = el("div", void 0, "box-dimensions");
+        const center = el2("div", void 0, "box-center");
+        const dimensions = el2("div", void 0, "box-dimensions");
         dimensions.dataset.layoutWidth = w === void 0 ? "N/A" : String(w);
         dimensions.dataset.layoutHeight = h === void 0 ? "N/A" : String(h);
         dimensions.dataset.geometry = w === void 0 || h === void 0 ? "unknown" : "known";
@@ -501,45 +667,45 @@ window.addEventListener('error',function(event){var title=document.getElementByI
         border.append(corners2(["radiusBottomLeft", "radiusBottomRight"]));
         map.append(border);
         card.append(map);
-        card.append(el("p", "Radius\uB294 Border\uC758 \uB124 \uBAA8\uC11C\uB9AC \uAC12 \xB7 \uC2E4\uC81C \uACE1\uC120 \uB80C\uB354\uB9C1 \uC5C6\uC74C", "preview-note"));
-        const metrics = el("div", void 0, "preview-metrics");
+        card.append(el2("p", "Radius\uB294 Border\uC758 \uB124 \uBAA8\uC11C\uB9AC \uAC12 \xB7 \uC2E4\uC81C \uACE1\uC120 \uB80C\uB354\uB9C1 \uC5C6\uC74C", "preview-note"));
+        const metrics = el2("div", void 0, "preview-metrics");
         for (const key of structureKeys.filter((k) => k === "rowGap" || k === "columnGap")) metrics.append(metric(key, p[key], side.source));
         card.append(metrics);
         const inner = contentSize(p, side.source, side.css);
-        const content = el("p", "content " + shown(inner.width) + " \xD7 " + shown(inner.height), "preview-content");
+        const content = el2("p", "content " + shown(inner.width) + " \xD7 " + shown(inner.height), "preview-content");
         content.title = inner.width.status === "supported" ? "\uC6F9 \uD655\uC778\uB41C border-box \u2212 padding \u2212 border" : inner.width.reason;
         content.dataset.status = inner.width.status;
         card.append(content);
-        if (inner.width.status !== "supported") card.append(el("p", inner.width.reason, "preview-note"));
+        if (inner.width.status !== "supported") card.append(el2("p", inner.width.reason, "preview-note"));
       } else if (kind === "color") {
         const colorKeys = sides.length === 1 && side.source === "figma" ? ["textColor", "backgroundColor"] : ["backgroundColor", "textColor", "borderTopColor", "borderRightColor", "borderBottomColor", "borderLeftColor"];
         for (const key of colorKeys) {
           if (sides.length === 1 && side.source === "figma" && p[key].status !== "supported") continue;
-          const row = el("div", void 0, "preview-color-row");
+          const row = el2("div", void 0, "preview-color-row");
           const label = metric(key, p[key], side.source);
-          label.replaceChildren(propertyIcon(key), el("span", labels[key], "preview-value"));
+          label.replaceChildren(propertyIcon(key), el2("span", labels[key], "preview-value"));
           row.append(label);
-          const value = rgba(p[key]);
+          const value = rgba2(p[key]);
           if (value) {
-            const checker = el("span", void 0, "preview-checker");
-            const paint = el("span", void 0, "preview-paint");
+            const checker = el2("span", void 0, "preview-checker");
+            const paint = el2("span", void 0, "preview-paint");
             paint.style.backgroundColor = `rgba(${value.join(",")})`;
             bindColor(paint, value);
             paint.setAttribute("aria-hidden", "true");
             checker.append(paint);
-            const text = colorValue(value);
+            const text2 = colorValue(value);
             if (sides.length === 1 && side.source === "figma") {
-              const pair = el("span", void 0, "preview-color-value");
-              pair.append(checker, text);
+              const pair = el2("span", void 0, "preview-color-value");
+              pair.append(checker, text2);
               row.append(pair);
-            } else row.append(checker, text);
-          } else row.append(el("span", "N/A", "preview-na"));
+            } else row.append(checker, text2);
+          } else row.append(el2("span", "N/A", "preview-na"));
           card.append(row);
         }
       } else {
-        const list = el("div", void 0, "preview-fonts");
+        const list = el2("div", void 0, "preview-fonts");
         for (const key of ["fontFamily", "fontSize", "fontWeight", "lineHeight", "letterSpacing"]) list.append(metric(key, p[key], side.source));
-        card.append(list, el("p", "\uC694\uCCAD\uB41C font-family \uC694\uC57D \xB7 \uC2E4\uC81C \uC0AC\uC6A9 font/fallback\uC740 \uD655\uC778\uD558\uC9C0 \uC54A\uC74C", "preview-note"));
+        card.append(list, el2("p", "\uC694\uCCAD\uB41C font-family \uC694\uC57D \xB7 \uC2E4\uC81C \uC0AC\uC6A9 font/fallback\uC740 \uD655\uC778\uD558\uC9C0 \uC54A\uC74C", "preview-note"));
       }
     }
     return details;
@@ -566,28 +732,23 @@ window.addEventListener('error',function(event){var title=document.getElementByI
   function categoryLabel(category) {
     const label = document.createElement("span");
     label.className = "category-label";
-    const text = document.createElement("span");
-    text.className = "category-label-text";
-    text.textContent = categoryLabels[category];
-    label.append(svg(paths2[category], "category-icon"), text);
+    const text2 = document.createElement("span");
+    text2.className = "category-label-text";
+    text2.textContent = categoryLabels[category];
+    label.append(svg(paths2[category], "category-icon"), text2);
     return label;
-  }
-  function groupChevron() {
-    return svg("M6 4L10 8L6 12", "group-chevron");
   }
 
   // apps/figma-plugin/src/property-view.ts
-  var element = (tag, text) => {
+  var element = (tag, text2) => {
     const node = document.createElement(tag);
-    if (text !== void 0) node.textContent = text;
+    if (text2 !== void 0) node.textContent = text2;
     return node;
   };
-  var groupState = /* @__PURE__ */ new Map();
   var pendingFocus = "";
   function clearProperties(target) {
     const active = document.activeElement;
     if (active instanceof HTMLElement && (active.id.startsWith("group-toggle-") || active.id.startsWith("figma-visual-"))) pendingFocus = active.id;
-    for (const d of Array.from(target.querySelectorAll(".property-group"))) if (d.dataset.userToggle === "true") groupState.set(d.dataset.category, d.open);
     target.replaceChildren();
   }
   function propertyRow(key, value, detail = false) {
@@ -631,7 +792,7 @@ window.addEventListener('error',function(event){var title=document.getElementByI
     table.append(head);
     return table;
   }
-  function renderProperties(target, properties) {
+  function renderProperties(target, properties, shadows) {
     clearProperties(target);
     const main = element("div");
     main.id = "property-main";
@@ -641,43 +802,44 @@ window.addEventListener('error',function(event){var title=document.getElementByI
     for (const [category, categoryKeys] of Object.entries(categories)) {
       const selected = categoryKeys.filter((key) => properties[key].status === "supported");
       if (!selected.length) continue;
-      const group = document.createElement("details");
+      const group = document.createElement("section");
       group.className = "property-group";
       group.dataset.category = category;
-      group.open = groupState.get(category) ?? true;
-      if (groupState.has(category)) group.dataset.userToggle = "true";
-      const summary = element("summary");
-      summary.addEventListener("click", () => {
-        group.dataset.userToggle = "true";
-      });
-      summary.id = "group-toggle-" + category;
-      summary.setAttribute("aria-expanded", String(group.open));
-      summary.setAttribute("aria-controls", "group-content-" + category);
-      summary.append(categoryLabel(category));
-      summary.append(groupChevron());
-      group.append(summary);
-      group.addEventListener("toggle", () => {
-        if (!target.contains(group)) return;
-        if (group.dataset.userToggle === "true") groupState.set(category, group.open);
-        summary.setAttribute("aria-expanded", String(group.open));
-      });
-      const kind = category === "size" ? "structure" : category === "color" ? "color" : category === "typography" ? "typography" : void 0;
-      if (kind) group.append(visualPreview("figma-visual-" + kind, kind, [{ title: "Figma", source: "figma", properties }], () => void 0, (key) => {
-        let row = target.querySelector(`#property-main .property-table tr[data-key=${key}]`);
-        if (row) {
-          const parent2 = row.closest("details");
-          if (parent2 instanceof HTMLDetailsElement) parent2.open = true;
-        } else {
-          document.getElementById("property-more")?.click();
-          row = target.querySelector(`#property-extra tr[data-key=${key}]`);
-        }
-        if (row) {
-          row.classList.add("preview-target");
-          row.tabIndex = -1;
-          row.focus();
-          row.scrollIntoView({ block: "center" });
-        }
-      }));
+      const heading2 = element("h2");
+      heading2.id = "group-toggle-" + category;
+      heading2.append(categoryLabel(category));
+      group.setAttribute("aria-labelledby", heading2.id);
+      group.append(heading2);
+      const kind = category === "size" ? "structure" : void 0;
+      if (kind) {
+        const preview2 = visualPreview("figma-visual-" + kind, kind, [{ title: "Figma", source: "figma", properties }], () => void 0, (key) => {
+          let row = target.querySelector(`#property-main .property-table tr[data-key=${key}]`);
+          if (row) {
+            const parent2 = row.closest("details");
+            if (parent2 instanceof HTMLDetailsElement) parent2.open = true;
+          } else {
+            document.getElementById("property-more")?.click();
+            row = target.querySelector(`#property-extra tr[data-key=${key}]`);
+          }
+          if (row) {
+            row.classList.add("preview-target");
+            row.tabIndex = -1;
+            row.focus();
+            row.scrollIntoView({ block: "center" });
+          }
+        });
+        const fixed = element("section");
+        fixed.id = preview2.id;
+        fixed.className = "property-preview preview-static";
+        fixed.setAttribute("aria-label", "\uC601\uC5ED \uAD6C\uC870");
+        const subheading = element("h3", "\uC601\uC5ED \uAD6C\uC870");
+        subheading.id = preview2.id + "-summary";
+        fixed.append(subheading);
+        for (const child of Array.from(preview2.children)) if (child.tagName !== "SUMMARY") fixed.append(child);
+        fixed.querySelector(".preview-side > h3")?.remove();
+        fixed.querySelector(".preview-note").textContent = "Border \uC548\uC5D0 Padding\uACFC \uD06C\uAE30, \uB124 \uBAA8\uC11C\uB9AC\uC5D0 Radius\uB97C \uD45C\uC2DC\uD569\uB2C8\uB2E4. \uB3C4\uC2DD\uC740 \uBE44\uB840 \uCD95\uCC99\uC774 \uC544\uB2D9\uB2C8\uB2E4.";
+        group.append(fixed);
+      }
       const table = tableFor(categoryLabels[category]);
       table.id = "group-content-" + category;
       const body = element("tbody");
@@ -686,6 +848,12 @@ window.addEventListener('error',function(event){var title=document.getElementByI
       group.append(table);
       main.append(group);
     }
+    const shadow = shadowValues(shadows);
+    const oldHeading = shadow.querySelector("h3");
+    const shadowHeading = element("h2");
+    shadowHeading.append(...Array.from(oldHeading.childNodes));
+    oldHeading.replaceWith(shadowHeading);
+    main.append(shadow);
     target.append(main);
     if (missing.length) {
       const more = element("button", `\uC790\uC138\uD788 \uBCF4\uAE30 \xB7 \uCD94\uAC00 \uC815\uBCF4 ${missing.length}\uAC1C`);
@@ -721,6 +889,11 @@ window.addEventListener('error',function(event){var title=document.getElementByI
         more.focus();
       };
     }
+    if (shadows) {
+      const extra = target.querySelector("#property-extra");
+      if (extra) extra.append(shadowDetails(shadows));
+      else main.append(shadowDetails(shadows));
+    }
     if (pendingFocus && document.activeElement === document.body) document.getElementById(pendingFocus)?.focus({ preventScroll: true });
     pendingFocus = "";
   }
@@ -747,6 +920,20 @@ window.addEventListener('error',function(event){var title=document.getElementByI
       close.focus();
     };
     close.onclick = dismiss;
+    if (name === "settings") {
+      let startedOutside = false;
+      const outside = (e) => {
+        const r = dialog.getBoundingClientRect();
+        return e.target === dialog && (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom);
+      };
+      dialog.addEventListener("pointerdown", (e) => {
+        startedOutside = outside(e);
+      });
+      dialog.addEventListener("pointerup", (e) => {
+        if (startedOutside && outside(e)) dismiss();
+        startedOutside = false;
+      });
+    }
     dialog.addEventListener("cancel", (e) => {
       e.preventDefault();
       dismiss();
@@ -758,7 +945,7 @@ window.addEventListener('error',function(event){var title=document.getElementByI
         dismiss();
       }
       if (e.key === "Tab") {
-        const items = Array.from(dialog.querySelectorAll("button,a[href],input,textarea,select,summary")).filter((el2) => el2.getClientRects().length > 0 && !el2.disabled);
+        const items = Array.from(dialog.querySelectorAll("button,a[href],input,textarea,select,summary")).filter((el3) => el3.getClientRects().length > 0 && !el3.disabled);
         const first = items[0], last = items[items.length - 1];
         if (e.shiftKey && document.activeElement === first) {
           e.preventDefault();
@@ -778,7 +965,7 @@ window.addEventListener('error',function(event){var title=document.getElementByI
   }
 
   // apps/figma-plugin/src/protocol.ts
-  var BUILD = "0.3.7";
+  var BUILD = "0.3.23";
   var PROTOCOL = "figcheck-plugin-1";
   var RESPONSE_TIMEOUT_MS = 8e3;
 
@@ -797,10 +984,10 @@ window.addEventListener('error',function(event){var title=document.getElementByI
   copy.classList.add("action-control");
   copy.title = "\uC120\uD0DD\uD55C \uB514\uC790\uC778 JSON \uBCF5\uC0AC";
   var copyFeedbackAnimation;
-  function setCopyLabel(text, animate = false) {
+  function setCopyLabel(text2, animate = false) {
     copyFeedbackAnimation?.cancel();
     copyFeedbackAnimation = void 0;
-    if (copyText.textContent !== text) copyText.replaceChildren(actionIcon(text === "\uBCF5\uC0AC \uC644\uB8CC" ? "check" : "copy"), document.createTextNode(text));
+    if (copyText.textContent !== text2) copyText.replaceChildren(actionIcon(text2 === "\uBCF5\uC0AC \uC644\uB8CC" ? "check" : "copy"), document.createTextNode(text2));
     if (animate && !matchMedia("(prefers-reduced-motion: reduce)").matches) copyFeedbackAnimation = copyText.animate([{ opacity: 0.2, transform: "translateY(1px)" }, { opacity: 1, transform: "translateY(0)" }], { duration: 160, easing: "ease-out" });
   }
   var copyNoticeTimer;
@@ -818,7 +1005,8 @@ window.addEventListener('error',function(event){var title=document.getElementByI
   var diagnostics = document.querySelector("#details-text");
   var download = document.querySelector("#download");
   var refresh = document.querySelector("#refresh");
-  setAction(download, "save", download.textContent, "\uB514\uC790\uC778 JSON \uD30C\uC77C \uC800\uC7A5");
+  setAction(download, "save", "", "\uB514\uC790\uC778 JSON \uD30C\uC77C \uC800\uC7A5");
+  download.setAttribute("aria-label", "\uB514\uC790\uC778 JSON \uD30C\uC77C \uC800\uC7A5");
   setAction(document.getElementById("manual-copy"), "copy", void 0, "\uC120\uD0DD\uD55C JSON \uB2E4\uC2DC \uBCF5\uC0AC");
   setAction(document.getElementById("json-toggle"), "json", void 0, "JSON \uC6D0\uBB38 \uBCF4\uAE30");
   setAction(refresh, "refresh");
@@ -833,7 +1021,7 @@ window.addEventListener('error',function(event){var title=document.getElementByI
   var hostBuild = "\uC751\uB2F5 \uC804";
   var lastError = "";
   var history = [];
-  function record2(label) {
+  function record3(label) {
     history.push((/* @__PURE__ */ new Date()).toISOString() + " " + label);
     if (history.length > 12) history.shift();
     diagnostics.textContent = `UI: ${BUILD}
@@ -864,14 +1052,16 @@ Host: ${hostBuild}
     if (timer !== void 0) clearTimeout(timer);
     timer = void 0;
   }
-  function show(next, heading, message) {
+  function show(next, heading2, message) {
     state2 = next;
-    title.textContent = heading;
+    title.textContent = heading2;
+    title.title = heading2;
     status.textContent = message;
+    status.title = message;
     document.body.dataset.state = next;
     refresh.disabled = false;
     setAction(refresh, "refresh", connected ? "\uC0C8\uB85C \uCD94\uCD9C" : "\uB2E4\uC2DC \uC5F0\uACB0");
-    record2(next);
+    record3(next);
   }
   function fail(message, detail = "") {
     clearDeadline();
@@ -956,11 +1146,11 @@ Host: ${hostBuild}
     clearDeadline();
     invalidate();
     if (m.state === "empty-selection") {
-      show("empty-selection", "\uC120\uD0DD\uD55C \uB178\uB4DC\uAC00 \uC5C6\uC5B4\uC694", "Figma \uCE94\uBC84\uC2A4\uB098 \uB808\uC774\uC5B4 \uBAA9\uB85D\uC5D0\uC11C \uB178\uB4DC \uD558\uB098\uB97C \uC120\uD0DD\uD574\uC8FC\uC138\uC694. \uC120\uD0DD\uC774 \uBC14\uB00C\uBA74 \uC790\uB3D9\uC73C\uB85C \uD655\uC778\uD569\uB2C8\uB2E4.");
+      show("empty-selection", "\uC120\uD0DD\uD55C \uB178\uB4DC\uAC00 \uC5C6\uC5B4\uC694", "Figma \uCE94\uBC84\uC2A4\uB098 \uB808\uC774\uC5B4 \uBAA9\uB85D\uC5D0\uC11C \uBE44\uAD50\uD560 \uC694\uC18C \uD558\uB098\uB97C \uC120\uD0DD\uD558\uC138\uC694. \uC120\uD0DD\uD558\uBA74 \uC18D\uC131\uC744 \uC790\uB3D9\uC73C\uB85C \uAC00\uC838\uC635\uB2C8\uB2E4.");
       return;
     }
     if (m.state === "multiple-selection") {
-      show("multiple-selection", "\uB178\uB4DC \uD558\uB098\uB9CC \uC120\uD0DD\uD574\uC8FC\uC138\uC694", `${m.selectionCount ?? "\uC5EC\uB7EC"}\uAC1C\uAC00 \uC120\uD0DD\uB418\uC5B4 \uC788\uC5B4\uC694. \uD558\uB098\uB97C \uB0A8\uACA8 \uC120\uD0DD\uD55C \uB4A4 \uB2E4\uC2DC \uD655\uC778\uD574\uC8FC\uC138\uC694.`);
+      show("multiple-selection", "\uB178\uB4DC \uD558\uB098\uB9CC \uC120\uD0DD\uD574\uC8FC\uC138\uC694", `${m.selectionCount ?? "\uC5EC\uB7EC"}\uAC1C\uAC00 \uC120\uD0DD\uB418\uC5B4 \uC788\uC5B4\uC694. \uBE44\uAD50\uD560 \uC694\uC18C \uD558\uB098\uB9CC \uC120\uD0DD\uD558\uBA74 \uC790\uB3D9\uC73C\uB85C \uAC00\uC838\uC635\uB2C8\uB2E4.`);
       return;
     }
     if (m.state === "error") {
@@ -976,10 +1166,13 @@ Host: ${hostBuild}
         preview.value = JSON.stringify(doc, null, 2);
         preview.setSelectionRange(0, 0);
         preview.scrollTop = 0;
-        renderProperties(document.getElementById("properties"), doc.nodes[0].properties);
+        renderProperties(document.getElementById("properties"), doc.nodes[0].properties, doc.nodes[0].shadows);
         document.getElementById("json-toggle").disabled = false;
         const values = Object.values(doc.nodes[0].properties);
-        if (!values.some((v) => v.status === "supported")) title.textContent = "\uCD94\uCD9C\uB41C \uAC12\uC774 \uC5C6\uC5B4\uC694";
+        if (!values.some((v) => v.status === "supported")) {
+          title.textContent = "\uBE44\uAD50\uD560 \uC218 \uC788\uB294 \uC18D\uC131\uC774 \uC5C6\uC5B4\uC694";
+          status.textContent = "\uB2E4\uB978 \uD504\uB808\uC784\uC774\uB098 \uD14D\uC2A4\uD2B8 \uC694\uC18C\uB97C \uC120\uD0DD\uD558\uC138\uC694. \uD604\uC7AC \uC694\uC18C\uC758 \uBBF8\uC9C0\uC6D0 \uC774\uC720\uB294 \uCD94\uAC00 \uC815\uBCF4\uC5D0\uC11C \uD655\uC778\uD560 \uC218 \uC788\uC5B4\uC694.";
+        }
         document.getElementById("property-summary").textContent = "";
       } catch (error) {
         fail("\uCD94\uCD9C\uB41C JSON\uC774 \uC62C\uBC14\uB974\uC9C0 \uC54A\uC544\uC694.", error instanceof Error ? error.message : String(error));
@@ -1003,7 +1196,7 @@ Host: ${hostBuild}
   }
   copy.onclick = async () => {
     if (!doc || state2 !== "complete" || copyingRevision === revision) return;
-    const current2 = revision, text = JSON.stringify(doc, null, 2), previous = copyTask;
+    const current2 = revision, text2 = JSON.stringify(doc, null, 2), previous = copyTask;
     const focusedCopy = document.activeElement === copy;
     let release;
     copyTask = new Promise((resolve) => {
@@ -1018,13 +1211,13 @@ Host: ${hostBuild}
       await previous;
       if (current2 !== revision) return;
       if (!navigator.clipboard?.writeText) throw new Error("Clipboard API unavailable");
-      await navigator.clipboard.writeText(text);
+      await navigator.clipboard.writeText(text2);
       announceCopied(current2);
     } catch {
       if (current2 !== revision || !doc || state2 !== "complete") return;
       const active = document.activeElement, scroll = window.scrollY;
       const helper = document.createElement("textarea");
-      helper.value = text;
+      helper.value = text2;
       helper.readOnly = true;
       helper.setAttribute("aria-hidden", "true");
       helper.tabIndex = -1;

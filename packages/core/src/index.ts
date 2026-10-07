@@ -1,3 +1,4 @@
+import { validateShadows, type Shadows, type ShadowComparison } from './shadows';
 /** Shared, host-independent data contract. Missing/unknown values never equal zero. */
 export const VERSION = '1.0' as const;
 export const categories = {
@@ -15,7 +16,7 @@ export type RGBA = [number, number, number, number];
 export type Value = { status: 'supported'; kind: 'px' | 'number' | 'string' | 'rgba'; value: number | string | RGBA; note?: string }
   | { status: 'unsupported' | 'unknown'; reason: string };
 export type Properties = Record<Key, Value>;
-export interface DesignNode { id: string; name: string; type: string; properties: Properties; children?: DesignNode[] }
+export interface DesignNode { id: string; name: string; type: string; properties: Properties; shadows?: Shadows; children?: DesignNode[] }
 export interface DesignDocument { schemaVersion: typeof VERSION; source: 'figma'; exportedAt: string; colorProfile?: 'SRGB' | 'DISPLAY_P3' | 'UNKNOWN'; nodes: DesignNode[] }
 export const unavailable = (reason: string, status: 'unsupported' | 'unknown' = 'unsupported'): Value => ({ status, reason });
 export const numberValue = (value: number, kind: 'px' | 'number' = 'px', note?: string): Value => Number.isFinite(value) ? ({ status: 'supported', kind, value, ...(note ? { note } : {}) }) : unavailable('유한한 숫자가 아님', 'unknown');
@@ -71,14 +72,14 @@ export function parseDesign(text: string): DesignDocument {
   let count = 0; const ids = new Set<string>();
   function node(v: unknown, depth: number) {
     assert(++count <= 256 && depth <= 16, '노드 최대 256개 / 깊이 최대 16'); assert(record(v), 'node 객체 필요');
-    exactKeys(v, ['id', 'name', 'type', 'properties', 'children'], 'node');
+    exactKeys(v, ['id', 'name', 'type', 'properties', 'children', 'shadows'], 'node');
     boundedText(v.id, 'id'); boundedText(v.name, 'name'); boundedText(v.type, 'type');
-    assert(!ids.has(v.id), '중복 node id'); ids.add(v.id); validateProperties(v.properties);
+    assert(!ids.has(v.id), '중복 node id'); ids.add(v.id); validateProperties(v.properties); if ('shadows' in v) validateShadows(v.shadows);
     if ('children' in v) { assert(Array.isArray(v.children), 'children 배열 필요'); v.children.forEach(c => node(c, depth + 1)); }
   }
   doc.nodes.forEach(n => node(n, 0));
   if (doc.colorProfile === 'DISPLAY_P3' || doc.colorProfile === 'UNKNOWN') {
-    const excludeColors = (n: DesignNode) => { for (const k of keys.filter(k => k.endsWith('Color'))) n.properties[k] = unavailable(`Figma ${doc.colorProfile} 색공간: sRGB 변환 미지원`); n.children?.forEach(excludeColors); };
+    const excludeColors = (n: DesignNode) => { for (const k of keys.filter(k => k.endsWith('Color'))) n.properties[k] = unavailable(`Figma ${doc.colorProfile} 색공간: sRGB 변환 미지원`); if(n.shadows)n.shadows={...n.shadows,status:'unsupported',reason:'Figma 색공간 sRGB 변환 미지원'}; n.children?.forEach(excludeColors); };
     (doc.nodes as DesignNode[]).forEach(excludeColors);
   }
   return doc as unknown as DesignDocument;
@@ -104,7 +105,7 @@ function within(delta: number, limit: number, epsilon: number): boolean {
 }
 export interface Diff { key: Key; category: Category; expected: Value; actual: Value; status: 'match' | 'mismatch' | 'excluded'; exclusion?: 'user' | 'unsupported'; delta?: number | RGBA; reason?: string }
 export interface Summary { supported: number; matched: number; score: number | null }
-export interface Comparison { rows: Diff[]; total: Summary; categories: Record<Category, Summary> }
+export interface Comparison { shadows?: ShadowComparison; rows: Diff[]; total: Summary; categories: Record<Category, Summary> }
 export function compare(expected: Properties, actual: Properties, tolerance: Tolerance = normalTolerance, included: readonly Key[] = keys): Comparison {
   for (const key of Object.keys(normalTolerance) as (keyof Tolerance)[]) {
     const value = tolerance[key], max = key === 'alpha' || key === 'opacity' ? 1 : key === 'colorChannel' ? 255 : 1e4;
@@ -144,3 +145,5 @@ export function cssColor(raw: string): Value {
   const rgba: RGBA = [Number(m[1]), Number(m[2]), Number(m[3]), m[4] === undefined ? 1 : Number(m[4])];
   return rgba.every((v, i) => Number.isFinite(v) && v >= 0 && v <= (i === 3 ? 1 : 255)) ? colorValue(rgba) : unavailable('색 범위 오류');
 }
+
+export * from './shadows';

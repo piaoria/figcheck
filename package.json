@@ -1,6 +1,6 @@
 {
   "name": "figcheck",
-  "version": "0.3.7",
+  "version": "0.3.23",
   "private": true,
   "description": "Local, manually paired Figma and DOM property comparison",
   "workspaces": [
@@ -16,7 +16,8 @@
     "test:browser": "node scripts/browser-test.mjs && node scripts/plugin-browser-test.mjs",
     "fixture": "node scripts/fixture-server.mjs",
     "package": "python scripts/package.py",
-    "test:plugin-browser": "node scripts/plugin-browser-test.mjs"
+    "test:plugin-browser": "node scripts/plugin-browser-test.mjs",
+    "test:picker": "node scripts/picker-depth-test.mjs"
   },
   "devDependencies": {
     "@figma/plugin-typings": "^1.117.0",

@@ -1,0 +1,79 @@
+{
+  "id": "fixture:component-shadows",
+  "name": "Example shadow component",
+  "type": "COMPONENT",
+  "width": 48,
+  "height": 48,
+  "paddingLeft": 16,
+  "paddingRight": 16,
+  "paddingTop": 16,
+  "paddingBottom": 16,
+  "cornerRadius": 999,
+  "opacity": 1,
+  "fills": [
+    {
+      "type": "SOLID",
+      "color": {
+        "r": 0.9019607901568627,
+        "g": 0.9019607901568627,
+        "b": 0.9019607901568627
+      },
+      "opacity": 1
+    }
+  ],
+  "effects": [
+    {
+      "type": "DROP_SHADOW",
+      "visible": true,
+      "offset": {
+        "x": 5,
+        "y": 5
+      },
+      "radius": 20,
+      "spread": 0,
+      "color": {
+        "r": 0,
+        "g": 0,
+        "b": 0,
+        "a": 0.15000000596046448
+      },
+      "blendMode": "NORMAL",
+      "showShadowBehindNode": false
+    },
+    {
+      "type": "DROP_SHADOW",
+      "visible": true,
+      "offset": {
+        "x": -5,
+        "y": -5
+      },
+      "radius": 20,
+      "spread": 0,
+      "color": {
+        "r": 1,
+        "g": 1,
+        "b": 1,
+        "a": 1
+      },
+      "blendMode": "NORMAL",
+      "showShadowBehindNode": false
+    },
+    {
+      "type": "INNER_SHADOW",
+      "visible": true,
+      "offset": {
+        "x": 1,
+        "y": 1
+      },
+      "radius": 1,
+      "spread": 0,
+      "color": {
+        "r": 1,
+        "g": 1,
+        "b": 1,
+        "a": 1
+      },
+      "blendMode": "NORMAL"
+    }
+  ]
+}

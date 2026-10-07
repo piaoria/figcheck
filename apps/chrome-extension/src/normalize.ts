@@ -1,3 +1,4 @@
+import {parseBoxShadows,shadowUnavailable} from '../../../packages/core/src/shadows';
 import { cssColor, cssLength, emptyProperties, numberValue, stringValue, unavailable, type Properties, type Key } from '../../../packages/core/src/index';
 import type { DOMSnapshot } from './collect';
 export function normalizeDOM(snapshot: DOMSnapshot): Properties {
@@ -21,4 +22,10 @@ export function normalizeDOM(snapshot: DOMSnapshot): Properties {
   const opacity = s.opacity; p.opacity = /^(?:0(?:\.\d+)?|1(?:\.0+)?)$/.test(opacity) ? numberValue(Number(opacity), 'number', '요소 자체 opacity. 조상 opacity 및 paint alpha와 합성 안 함') : unavailable('opacity numeric 확인 불가');
   if (snapshot.textIssue) for (const key of ['fontFamily', 'fontSize', 'fontWeight', 'lineHeight', 'letterSpacing', 'textColor'] as const) p[key] = unavailable(snapshot.textIssue, 'unknown');
   return p;
+}
+
+export function normalizeShadows(snapshot:DOMSnapshot):import('../../../packages/core/src/shadows').Shadows {
+ if(!snapshot.ok)return shadowUnavailable('DOM 그림자 미수집','unknown');
+ if(snapshot.geometryIssue||snapshot.shadowIssue)return shadowUnavailable(snapshot.geometryIssue||snapshot.shadowIssue!);
+ return parseBoxShadows(snapshot.computed?.['box-shadow']);
 }

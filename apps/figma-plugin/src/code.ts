@@ -1,5 +1,6 @@
 import { isColorFormat } from '../../../packages/ui/color';
 import { extractNode } from './extract';
+import { extractShadows } from './shadow-extract';
 import { VERSION, type DesignDocument } from '../../../packages/core/src/index';
 import { BUILD, PROTOCOL, type Request, type HostMessage } from './protocol';
 
@@ -28,7 +29,9 @@ function send(message: Omit<HostMessage, 'protocol' | 'session' | 'requestId' | 
   figma.ui.postMessage({ ...message, protocol: PROTOCOL, session, requestId, sequence: ++sequence, build: BUILD });
 }
 /** Entire API read is inside try: even currentPage/selection failures receive an error response. */
+let extraction = 0;
 function snapshot() {
+  const generation = ++extraction, owner = session, ownerRequest = requestId;
   if (!session) return; // UI explicitly announces that its message listener is ready.
   try {
     if (startupError) { send({ type: 'state', state: 'error', ...startupError }); return; }
@@ -37,7 +40,13 @@ function snapshot() {
     if (selection.length !== 1) { send({ type: 'state', state: selection.length ? 'multiple-selection' : 'empty-selection', selectionCount: selection.length }); return; }
     const profile = figma.root.documentColorProfile;
     const document: DesignDocument = { schemaVersion: VERSION, source: 'figma', colorProfile: profile === 'SRGB' ? 'SRGB' : profile === 'DISPLAY_P3' ? 'DISPLAY_P3' : 'UNKNOWN', exportedAt: new Date().toISOString(), nodes: [extractNode(selection[0], figma.mixed, profile)] };
-    send({ type: 'state', state: 'complete', document });
+    const chosen=selection[0];
+    const finish=()=>{if(generation===extraction&&owner===session&&ownerRequest===requestId)send({type:'state',state:'complete',document});};
+    if(document.nodes[0].shadows?.status==='unknown' && 'effects' in chosen && chosen.effects.some(e=>e.visible!==false)){
+      const unavailableCSS=(reason:string)=>{const old=document.nodes[0].shadows!;document.nodes[0].shadows={...old,status:'unknown',layers:[],reason};finish();};
+      const timeout=setTimeout(()=>{if(generation===extraction){unavailableCSS('getCSSAsync 응답 시간 초과');++extraction;}},1200);
+      void Promise.resolve().then(()=>chosen.getCSSAsync()).then(css=>{if(generation===extraction){try{document.nodes[0].shadows=extractShadows(chosen,profile,css);finish();}catch{unavailableCSS('CSS 추출 중 노드 변경/제거: 다시 추출하세요.');}}},()=>{if(generation===extraction)unavailableCSS('getCSSAsync 실패: 그림자 대응 제외');}).finally(()=>clearTimeout(timeout));
+    }else finish();
   } catch (error) {
     const info = errorInfo(error);
     console.error('[FigCheck ' + BUILD + '] extract: ' + info.message);
@@ -74,7 +83,7 @@ figma.ui.onmessage = (value: unknown) => {
     return;
   }
   if (m.type === 'refresh') { requestId = m.requestId; snapshot(); }
-  if (m.type === 'close') figma.closePlugin();
+  if (m.type === 'close') { ++extraction; figma.closePlugin(); }
 };
 try { figma.on('selectionchange', snapshot); }
 catch (error) { startupError = errorInfo(error); console.error('[FigCheck ' + BUILD + '] selectionchange: ' + startupError.message); }

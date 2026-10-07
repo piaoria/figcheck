@@ -1,6 +1,6 @@
 import { createPickerController } from './picker-controller';
 import type { PickerState } from './picker-controller';
-chrome.devtools.panels.create('FigCheck', '', 'panel.html', panel => {
+chrome.devtools.panels.create('FigCheck ⇄', 'icons/icon-32.png', 'panel.html', panel => {
   type PanelWindow = Window & { figcheckRefresh?: () => void; figcheckPickerState?: (state: PickerState) => void };
   let target: PanelWindow | undefined;
   const controller = createPickerController(state => target?.figcheckPickerState?.(state));

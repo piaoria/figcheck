@@ -1,5 +1,6 @@
 import { colorValue, emptyProperties, numberValue, stringValue, unavailable, type DesignNode, type Value } from '../../../packages/core/src/index';
 
+import { extractShadows } from './shadow-extract';
 /** Read-only adapter: never mutate document or infer weight from a font style name. */
 export function extractNode(node: SceneNode, mixed: symbol, colorProfile: string): DesignNode {
   const p = emptyProperties();
@@ -58,5 +59,5 @@ export function extractNode(node: SceneNode, mixed: symbol, colorProfile: string
       p[key] = 'cornerSmoothing' in node && node.cornerSmoothing > 0 ? unavailable('Figma cornerSmoothing: CSS radius와 형태 다름') : numeric(source in node ? (node as SceneNode & Record<typeof source, number>)[source] : node.cornerRadius, key);
     }
   }
-  return { id: node.id, name: node.name || '(이름 없음)', type: node.type, properties: p };
+  return { id: node.id, name: node.name || '(이름 없음)', type: node.type, properties: p, ...('effects' in node ? {shadows:extractShadows(node,colorProfile)} : {}) };
 }

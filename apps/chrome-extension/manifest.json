@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "FigCheck",
-  "version": "0.3.7",
+  "version": "0.3.23",
   "description": "수동 선택한 Figma 노드와 Elements DOM 속성을 로컬에서 비교합니다.",
   "devtools_page": "devtools.html",
   "content_security_policy": {
@@ -22,6 +22,18 @@
   "minimum_chrome_version": "140",
   "action": {
     "default_title": "FigCheck · DevTools에서 비교",
-    "default_popup": "help.html"
+    "default_popup": "help.html",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png",
+      "48": "icons/icon-48.png",
+      "128": "icons/icon-128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
   }
 }

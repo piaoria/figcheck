@@ -11,6 +11,12 @@ function initializeDialog(name: 'help' | 'settings') {
     if(!dialog.open)dialog.showModal();dialog.scrollTop=0;trigger.setAttribute('aria-expanded','true');close.focus();
   };
   close.onclick=dismiss;
+  if(name==='settings'){
+    let startedOutside=false;
+    const outside=(e:PointerEvent)=>{const r=dialog.getBoundingClientRect();return e.target===dialog&&(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom);};
+    dialog.addEventListener('pointerdown',e=>{startedOutside=outside(e);});
+    dialog.addEventListener('pointerup',e=>{if(startedOutside&&outside(e))dismiss();startedOutside=false;});
+  }
   dialog.addEventListener('cancel',e=>{e.preventDefault();dismiss();});
   dialog.addEventListener('keydown',e=>{
     if(e.key==='Escape'){e.preventDefault();e.stopImmediatePropagation();dismiss();}

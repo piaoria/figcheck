@@ -1,15 +1,16 @@
+import {shadowValues,shadowDetails} from '../../../packages/ui/shadow-view';
+import type {Shadows} from '../../../packages/core/src/shadows';
 import { visualPreview } from '../../../packages/ui/visual-preview';
 import { colorValue, bindColor } from '../../../packages/ui/color-display';
-import { categoryLabel, groupChevron } from '../../../packages/ui/category-icon';
+import { categoryLabel } from '../../../packages/ui/category-icon';
 import { propertyLabel } from '../../../packages/ui/property-icon';
 import { categories, keys, type Properties, type Value, type Category, type Key } from '../../../packages/core/src/index';
 import { categoryLabels } from '../../../packages/ui/properties';
 import { valueText } from '../../../packages/ui/format';
 const element = (tag: string, text?: string) => { const node=document.createElement(tag); if(text!==undefined)node.textContent=text; return node; };
-const groupState=new Map<string,boolean>();let pendingFocus='';
+let pendingFocus='';
 export function clearProperties(target: HTMLElement) {
   const active=document.activeElement;if(active instanceof HTMLElement&&(active.id.startsWith('group-toggle-')||active.id.startsWith('figma-visual-')))pendingFocus=active.id;
-  for(const d of Array.from(target.querySelectorAll<HTMLDetailsElement>('.property-group')))if(d.dataset.userToggle==='true')groupState.set(d.dataset.category!,d.open);
   target.replaceChildren();
 }
 function propertyRow(key: Key, value: Value, detail=false) {
@@ -27,7 +28,7 @@ function tableFor(name: string, className='property-table', detail=false) {
   const head=element('thead'),headers=element('tr');for(const label of detail?['속성','값','상태']:['속성','값'])headers.append(element('th',label));head.append(headers);table.append(head);return table;
 }
 /** Keep the exchange document complete; only the default presentation is supported-only. */
-export function renderProperties(target: HTMLElement, properties: Properties) {
+export function renderProperties(target: HTMLElement, properties: Properties, shadows?:Shadows) {
   clearProperties(target);
   const main=element('div');main.id='property-main';
   const available=keys.filter(key=>properties[key].status==='supported');
@@ -35,20 +36,27 @@ export function renderProperties(target: HTMLElement, properties: Properties) {
   if(!available.length)main.append(element('p','지금 표시할 추출 값이 없어요. 자세히 보기에서 이유를 확인하거나 다른 노드를 선택하세요.'));
   for(const [category,categoryKeys] of Object.entries(categories)) {
     const selected=categoryKeys.filter(key=>properties[key].status==='supported');if(!selected.length)continue;
-    const group=document.createElement('details');group.className='property-group';group.dataset.category=category;group.open=groupState.get(category)??true;
-    if(groupState.has(category))group.dataset.userToggle='true';const summary=element('summary');summary.addEventListener('click',()=>{group.dataset.userToggle='true';});summary.id='group-toggle-'+category;summary.setAttribute('aria-expanded',String(group.open));summary.setAttribute('aria-controls','group-content-'+category);
-    summary.append(categoryLabel(category as Category));summary.append(groupChevron());group.append(summary);
-    group.addEventListener('toggle',()=>{if(!target.contains(group))return;if(group.dataset.userToggle==='true')groupState.set(category,group.open);summary.setAttribute('aria-expanded',String(group.open));});
-    const kind=category==='size'?'structure':category==='color'?'color':category==='typography'?'typography':undefined;
-    if(kind)group.append(visualPreview('figma-visual-'+kind,kind,[{title:'Figma',source:'figma',properties}],()=>undefined,key=>{
+    const group=document.createElement('section');group.className='property-group';group.dataset.category=category;
+    const heading=element('h2');heading.id='group-toggle-'+category;heading.append(categoryLabel(category as Category));group.setAttribute('aria-labelledby',heading.id);group.append(heading);
+    const kind=category==='size'?'structure':undefined;
+    if(kind){const preview=visualPreview('figma-visual-'+kind,kind,[{title:'Figma',source:'figma',properties}],()=>undefined,key=>{
       let row=target.querySelector<HTMLElement>(`#property-main .property-table tr[data-key=${key}]`);
       if(row){const parent=row.closest('details');if(parent instanceof HTMLDetailsElement)parent.open=true;}
       else{document.getElementById('property-more')?.click();row=target.querySelector<HTMLElement>(`#property-extra tr[data-key=${key}]`);}
       if(row){row.classList.add('preview-target');row.tabIndex=-1;row.focus();row.scrollIntoView({block:'center'});}
-    }));
+    });
+      const fixed=element('section');fixed.id=preview.id;fixed.className='property-preview preview-static';fixed.setAttribute('aria-label','영역 구조');
+      const subheading=element('h3','영역 구조');subheading.id=preview.id+'-summary';fixed.append(subheading);
+      for(const child of Array.from(preview.children))if(child.tagName!=='SUMMARY')fixed.append(child);
+      fixed.querySelector('.preview-side > h3')?.remove();
+      // Size, border, padding and radius remain visible; repeated explanatory metadata is concise.
+      fixed.querySelector('.preview-note')!.textContent='Border 안에 Padding과 크기, 네 모서리에 Radius를 표시합니다. 도식은 비례 축척이 아닙니다.';
+      group.append(fixed);
+    }
     const table=tableFor(categoryLabels[category]);table.id='group-content-'+category;
     const body=element('tbody');for(const key of selected)body.append(propertyRow(key,properties[key]));table.append(body);group.append(table);main.append(group);
   }
+  const shadow=shadowValues(shadows);const oldHeading=shadow.querySelector('h3')!;const shadowHeading=element('h2');shadowHeading.append(...Array.from(oldHeading.childNodes));oldHeading.replaceWith(shadowHeading);main.append(shadow);
   target.append(main);
   if(missing.length){
     const more=element('button',`자세히 보기 · 추가 정보 ${missing.length}개`) as HTMLButtonElement;more.id='property-more';more.className='secondary';more.setAttribute('aria-controls','property-extra');more.setAttribute('aria-expanded','false');main.append(more);
@@ -58,5 +66,6 @@ export function renderProperties(target: HTMLElement, properties: Properties) {
     more.onclick=()=>{main.hidden=true;extra.hidden=false;more.setAttribute('aria-expanded','true');back.focus();};
     back.onclick=()=>{extra.hidden=true;main.hidden=false;more.setAttribute('aria-expanded','false');more.focus();};
   }
+  if(shadows){const extra=target.querySelector('#property-extra');if(extra)extra.append(shadowDetails(shadows));else main.append(shadowDetails(shadows));}
   if(pendingFocus&&document.activeElement===document.body)document.getElementById(pendingFocus)?.focus({preventScroll:true});pendingFocus='';
 }

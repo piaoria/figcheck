@@ -11,7 +11,7 @@ for (const [name,args] of [
 ]) {
   const r=spawnSync(process.execPath,args,{encoding:'utf8'});
   process.stdout.write(r.stdout??'');process.stderr.write(r.stderr??'');
-  const count=name==='tests'?Number(/# tests (\d+)/.exec(r.stdout??'')?.[1]??0):undefined;
+  const count=name==='tests'?Number(/(?:#|ℹ) tests (\d+)/.exec(r.stdout??'')?.[1]??0):undefined;
   report.steps.push({name,exitCode:r.status,testCount:count});
   if(r.status!==0){report.completedAt=new Date().toISOString();writeFileSync('artifacts/verification-results.json',JSON.stringify(report,null,2));process.exit(r.status??1);}
 }

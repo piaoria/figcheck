@@ -7,7 +7,7 @@ const box: Shape = {tag:'rect',attrs:{x:'3',y:'3',width:'10',height:'10'},muted:
 const paddingBox: Shape[] = [{tag:'rect',attrs:{x:'2',y:'2',width:'12',height:'12'},muted:true},{tag:'rect',attrs:{x:'5',y:'5',width:'6',height:'6'},muted:true}];
 const top=[box,path('M3 3H13')],right=[box,path('M13 3V13')],bottom=[box,path('M3 13H13')],left=[box,path('M3 3V13')];
 /** Original geometric SVGs. Directions are screen coordinates; no Figma assets or imported markup. */
-const icons: Record<Key,Shape[]> = {
+export const icons: Record<Key,Shape[]> = {
   width:[path('M2 5V11M14 5V11M2 8H14M4 6L2 8L4 10M12 6L14 8L12 10')],
   height:[path('M5 2H11M5 14H11M8 2V14M6 4L8 2L10 4M6 12L8 14L10 12')],
   paddingTop:[...paddingBox,path('M5 3H11M8 3V5M6 5H10')],

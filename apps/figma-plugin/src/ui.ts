@@ -24,7 +24,7 @@ function resetCopyFeedback(){clearCopyNotice();setCopyLabel(copyLabel);}
 const diagnostics = document.querySelector<HTMLPreElement>('#details-text')!;
 const download = document.querySelector<HTMLButtonElement>('#download')!;
 const refresh = document.querySelector<HTMLButtonElement>('#refresh')!;
-setAction(download,'save',download.textContent!,'디자인 JSON 파일 저장');setAction(document.getElementById('manual-copy')!,'copy',undefined,'선택한 JSON 다시 복사');setAction(document.getElementById('json-toggle')!,'json',undefined,'JSON 원문 보기');setAction(refresh,'refresh');
+setAction(download,'save','','디자인 JSON 파일 저장');download.setAttribute('aria-label','디자인 JSON 파일 저장');setAction(document.getElementById('manual-copy')!,'copy',undefined,'선택한 JSON 다시 복사');setAction(document.getElementById('json-toggle')!,'json',undefined,'JSON 원문 보기');setAction(refresh,'refresh');
 const session = Date.now().toString(36) + '-' + Math.random().toString(36).slice(2);
 let doc: DesignDocument | undefined, requestId = 0, lastSequence = 0, connected = false;
 let timer: ReturnType<typeof setTimeout> | undefined;
@@ -38,7 +38,7 @@ function record(label: string) {
 function invalidate() { ++revision; resetCopyFeedback(); doc = undefined; clearProperties(document.getElementById('properties')!); (document.getElementById('json-toggle') as HTMLButtonElement).disabled=true;document.getElementById('json-toggle')!.setAttribute('aria-expanded','false');setAction(document.getElementById('json-toggle')!,'json','JSON 보기'); download.disabled = true; copy.disabled = true; preview.value = ''; copyStatus.textContent = ''; document.querySelector<HTMLElement>('#json-preview')!.hidden = true; document.querySelector<HTMLElement>('#manual-copy')!.hidden = true; document.querySelector<HTMLElement>('#property-summary')!.textContent = ''; }
 function clearDeadline() { if (timer !== undefined) clearTimeout(timer); timer = undefined; }
 function show(next: string, heading: string, message: string) {
-  state = next; title.textContent = heading; status.textContent = message;
+  state = next; title.textContent = heading; title.title=heading; status.textContent = message; status.title=message;
   document.body.dataset.state = next;
   refresh.disabled = false;
   setAction(refresh,'refresh',connected?'새로 추출':'다시 연결');
@@ -97,14 +97,14 @@ window.addEventListener('message', event => {
   connected = true;
   if (m.state === 'extracting') { invalidate(); show('extracting', '선택한 노드 추출 중', '현재 선택을 읽고 있어요. 잠시만 기다려주세요.'); refresh.disabled = true; waitForResponse(); return; }
   clearDeadline(); invalidate();
-  if (m.state === 'empty-selection') { show('empty-selection', '선택한 노드가 없어요', 'Figma 캔버스나 레이어 목록에서 노드 하나를 선택해주세요. 선택이 바뀌면 자동으로 확인합니다.'); return; }
-  if (m.state === 'multiple-selection') { show('multiple-selection', '노드 하나만 선택해주세요', `${m.selectionCount ?? '여러'}개가 선택되어 있어요. 하나를 남겨 선택한 뒤 다시 확인해주세요.`); return; }
+  if (m.state === 'empty-selection') { show('empty-selection', '선택한 노드가 없어요', 'Figma 캔버스나 레이어 목록에서 비교할 요소 하나를 선택하세요. 선택하면 속성을 자동으로 가져옵니다.'); return; }
+  if (m.state === 'multiple-selection') { show('multiple-selection', '노드 하나만 선택해주세요', `${m.selectionCount ?? '여러'}개가 선택되어 있어요. 비교할 요소 하나만 선택하면 자동으로 가져옵니다.`); return; }
   if (m.state === 'error') { fail(typeof m.message === 'string' ? m.message : 'Figma에서 추출에 실패했어요.', typeof m.detail === 'string' ? m.detail : ''); return; }
   if (m.state === 'complete') {
     try {
       doc = parseDesign(JSON.stringify(m.document)); download.disabled = false; copy.disabled = false;
       show('complete', '선택한 노드', doc.nodes[0].name);
-      preview.value = JSON.stringify(doc, null, 2); preview.setSelectionRange(0,0); preview.scrollTop = 0; renderProperties(document.getElementById('properties')!,doc.nodes[0].properties); (document.getElementById('json-toggle') as HTMLButtonElement).disabled=false; const values = Object.values(doc.nodes[0].properties);if(!values.some(v=>v.status==='supported'))title.textContent='추출된 값이 없어요'; document.getElementById('property-summary')!.textContent=''; 
+      preview.value = JSON.stringify(doc, null, 2); preview.setSelectionRange(0,0); preview.scrollTop = 0; renderProperties(document.getElementById('properties')!,doc.nodes[0].properties,doc.nodes[0].shadows); (document.getElementById('json-toggle') as HTMLButtonElement).disabled=false; const values = Object.values(doc.nodes[0].properties);if(!values.some(v=>v.status==='supported')){title.textContent='비교할 수 있는 속성이 없어요';status.textContent='다른 프레임이나 텍스트 요소를 선택하세요. 현재 요소의 미지원 이유는 추가 정보에서 확인할 수 있어요.';} document.getElementById('property-summary')!.textContent='';
     } catch (error) { fail('추출된 JSON이 올바르지 않아요.', error instanceof Error ? error.message : String(error)); }
     return;
   }

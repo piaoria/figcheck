@@ -1,5 +1,23 @@
 "use strict";
 (() => {
+  // apps/chrome-extension/src/selection-fingerprint.ts
+  function selectionFingerprint(selected) {
+    if (!selected || typeof selected !== "object" || !("nodeType" in selected) || selected.nodeType !== 1) return "missing";
+    const node = selected;
+    if (!node.isConnected) return "missing";
+    const win = node.ownerDocument.defaultView;
+    if (!win) return "missing";
+    const s = win.getComputedStyle(node), r = node.getBoundingClientRect();
+    const properties = Array.from(s).filter((k) => /^(width|height|box-|overflow|scrollbar|padding|row-gap|column-gap|display|font-|line-height|letter-spacing|color|background|border|opacity|transform|zoom|text-shadow|filter|backdrop-filter|mix-blend-mode)$|^(box-|overflow-|scrollbar-|padding-|border-|font-|background-)/.test(k));
+    const values = properties.map((k) => s.getPropertyValue(k));
+    const ancestry = [];
+    for (let n = node, depth = 0; n && depth < 64; n = n.parentElement ?? (n.getRootNode() instanceof win.ShadowRoot ? n.getRootNode().host : null), depth++) {
+      const c = win.getComputedStyle(n);
+      ancestry.push([c.transform, c.rotate, c.scale, c.translate, c.zoom, c.filter, c.backdropFilter, c.mixBlendMode]);
+    }
+    return JSON.stringify([node.tagName, node.id, node.className, node.getAttribute("style"), node.childElementCount, Array.from(node.childNodes).some((n) => n.nodeType === 3 && n.textContent?.trim()), win.getComputedStyle(node, "::before").content, win.getComputedStyle(node, "::after").content, r.width, r.height, node.getClientRects().length, values, ancestry]);
+  }
+
   // packages/ui/action-icon.ts
   var paths = {
     copy: "M9 9h11v12H9z M16 9V3H3v13h6",
@@ -26,10 +44,10 @@
     svg2.append(path2);
     return svg2;
   }
-  function setAction(button, action, text = button.textContent, title = text) {
+  function setAction(button, action, text2 = button.textContent, title = text2) {
     button.classList.add("action-control");
     button.title = title;
-    button.replaceChildren(actionIcon(action), document.createTextNode(text));
+    button.replaceChildren(actionIcon(action), document.createTextNode(text2));
   }
 
   // packages/ui/color.ts
@@ -37,9 +55,9 @@
     return value === "hex" || value === "rgb" || value === "hsl";
   }
   var decimal = (value, digits) => value !== 0 && Math.abs(value) < 10 ** -digits ? String(Number(value.toPrecision(3))) : String(Number(value.toFixed(digits)));
-  function formatColor(rgba2, format) {
-    if (rgba2.length !== 4 || rgba2.some((v, i) => !Number.isFinite(v) || v < 0 || v > (i === 3 ? 1 : 255))) return "\uAC12 \uC624\uB958";
-    const [red, green, blue, alpha] = rgba2;
+  function formatColor(rgba3, format) {
+    if (rgba3.length !== 4 || rgba3.some((v, i) => !Number.isFinite(v) || v < 0 || v > (i === 3 ? 1 : 255))) return "\uAC12 \uC624\uB958";
+    const [red, green, blue, alpha] = rgba3;
     if (format === "hex") {
       const hex = (value) => Math.round(value).toString(16).padStart(2, "0").toUpperCase();
       return "#" + [red, green, blue].map(hex).join("") + (alpha === 1 ? "" : hex(alpha * 255));
@@ -60,19 +78,19 @@
   // packages/ui/color-display.ts
   var current = "rgb";
   var currentColorFormat = () => current;
-  function update(node, rgba2) {
-    const text = formatColor(rgba2, current);
-    if (node.classList.contains("color-value")) node.textContent = text;
-    node.title = text + " \xB7 \uC6D0\uBCF8 RGBA " + JSON.stringify(rgba2);
+  function update(node, rgba3) {
+    const text2 = formatColor(rgba3, current);
+    if (node.classList.contains("color-value")) node.textContent = text2;
+    node.title = text2 + " \xB7 \uC6D0\uBCF8 RGBA " + JSON.stringify(rgba3);
   }
-  function bindColor(node, rgba2) {
-    node.dataset.rgba = JSON.stringify(rgba2);
-    update(node, rgba2);
+  function bindColor(node, rgba3) {
+    node.dataset.rgba = JSON.stringify(rgba3);
+    update(node, rgba3);
   }
-  function colorValue(rgba2) {
+  function colorValue(rgba3) {
     const span = document.createElement("span");
     span.className = "color-value";
-    bindColor(span, rgba2);
+    bindColor(span, rgba3);
     return span;
   }
   function initializeColorFormat(save) {
@@ -192,6 +210,20 @@
       close.focus();
     };
     close.onclick = dismiss;
+    if (name === "settings") {
+      let startedOutside = false;
+      const outside = (e) => {
+        const r = dialog.getBoundingClientRect();
+        return e.target === dialog && (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom);
+      };
+      dialog.addEventListener("pointerdown", (e) => {
+        startedOutside = outside(e);
+      });
+      dialog.addEventListener("pointerup", (e) => {
+        if (startedOutside && outside(e)) dismiss();
+        startedOutside = false;
+      });
+    }
     dialog.addEventListener("cancel", (e) => {
       e.preventDefault();
       dismiss();
@@ -203,7 +235,7 @@
         dismiss();
       }
       if (e.key === "Tab") {
-        const items = Array.from(dialog.querySelectorAll("button,a[href],input,textarea,select,summary")).filter((el2) => el2.getClientRects().length > 0 && !el2.disabled);
+        const items = Array.from(dialog.querySelectorAll("button,a[href],input,textarea,select,summary")).filter((el3) => el3.getClientRects().length > 0 && !el3.disabled);
         const first = items[0], last = items[items.length - 1];
         if (e.shiftKey && document.activeElement === first) {
           e.preventDefault();
@@ -220,6 +252,113 @@
   }
   function initializeSettings() {
     initializeDialog("settings");
+  }
+
+  // packages/ui/format.ts
+  function formatNumber(value) {
+    if (!Number.isFinite(value)) return "\uAC12 \uBBF8\uD655\uC778";
+    if (value === 0) return "0";
+    if (Math.abs(value) < 1e-3) return String(Number(value.toPrecision(3)));
+    return String(Number(value.toFixed(3)));
+  }
+  function valueText(v) {
+    if (v.status !== "supported") return v.status === "unsupported" ? "\uBBF8\uC9C0\uC6D0" : "\uAC12 \uBBF8\uD655\uC778";
+    if (v.kind === "rgba") return formatColor(v.value, currentColorFormat());
+    return `${typeof v.value === "number" ? formatNumber(v.value) : v.value}${v.kind === "px" ? " px" : ""}`;
+  }
+  var signed = (v) => `${v > 0 ? "+" : ""}${formatNumber(v)}`;
+  function deltaText(row) {
+    if (row.delta === void 0) return "\uAC12 \uB2E4\uB984";
+    if (Array.isArray(row.delta)) return row.delta.map((v, i) => `${["R", "G", "B", "\u03B1"][i]} ${signed(v)}`).join(", ");
+    return `${signed(row.delta)}${row.actual.status === "supported" && row.actual.kind === "px" ? "px" : ""}`;
+  }
+  function direction(row) {
+    if (Array.isArray(row.delta)) return "sRGB \uCC44\uB110\uBCC4 \uCC28\uC774 (\uC6F9 \u2212 \uB514\uC790\uC778)";
+    if (typeof row.delta !== "number" || row.delta === 0) return "\uB514\uC790\uC778\uACFC \uC6F9\uC758 \uAC12\uC774 \uB2E4\uB985\uB2C8\uB2E4.";
+    const unit = row.actual.status === "supported" && row.actual.kind === "px" ? "px" : "";
+    return `\uC6F9 \uAC12\uC774 ${formatNumber(Math.abs(row.delta))}${unit} ${row.delta > 0 ? "\uB354 \uD07D\uB2C8\uB2E4" : "\uB354 \uC791\uC2B5\uB2C8\uB2E4"}.`;
+  }
+  function exclusionLabel(row) {
+    if (row.exclusion === "user") return "\uC0AC\uC6A9\uC790 \uC81C\uC678";
+    if (row.expected.status === "unsupported" || row.actual.status === "unsupported") return "\uBBF8\uC9C0\uC6D0";
+    if (row.expected.status === "unknown" || row.actual.status === "unknown") return "\uAC12 \uBBF8\uD655\uC778";
+    return "\uAC12 \uC624\uB958";
+  }
+
+  // packages/ui/shadow-view.ts
+  var el = (tag, text2) => {
+    const n = document.createElement(tag);
+    if (text2 !== void 0) n.textContent = text2;
+    return n;
+  };
+  function heading() {
+    const h = el("h3");
+    const icon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    icon.setAttribute("viewBox", "0 0 24 24");
+    icon.setAttribute("aria-hidden", "true");
+    icon.style.cssText = "width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.5;vertical-align:middle;margin-right:6px";
+    const p = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    p.setAttribute("d", "M4 4h12v12H4z M8 19h11V8");
+    icon.append(p);
+    h.append(icon, document.createTextNode("\uADF8\uB9BC\uC790"));
+    return h;
+  }
+  function layerCell(layer) {
+    const cell = el("td");
+    cell.className = "shadow-value";
+    if (!layer) {
+      cell.textContent = "\uC5C6\uC74C";
+      return cell;
+    }
+    cell.append(el("span", `${layer.inset ? "\uB0B4\uBD80" : "\uC678\uBD80"} ${layer.index + 1}`), el("div", `X ${formatNumber(layer.x)} \xB7 Y ${formatNumber(layer.y)} \xB7 Blur ${formatNumber(layer.blur)} \xB7 Spread ${formatNumber(layer.spread)} px`));
+    const pair = el("span");
+    pair.className = "color-cell";
+    const swatch = el("span");
+    swatch.className = "swatch";
+    swatch.setAttribute("aria-hidden", "true");
+    swatch.style.backgroundColor = `rgba(${layer.color.join(",")})`;
+    bindColor(swatch, layer.color);
+    pair.append(swatch, colorValue(layer.color));
+    cell.append(pair);
+    return cell;
+  }
+  function shadowDetails(s) {
+    const d = el("details");
+    d.className = "shadow-details";
+    d.append(el("summary", "\uADF8\uB9BC\uC790 \xB7 \uCD94\uAC00 \uC815\uBCF4"), el("p", s.reason ?? "Figma \uC6D0\uBCF8 effects \uBC0F CSS \uB300\uC751 \uADFC\uAC70"), el("pre", JSON.stringify({ effects: s.effects, css: s.css, mapping: s.mapping }, null, 2)));
+    return d;
+  }
+  function shadowComparison(c) {
+    const section = el("section");
+    section.className = "shadow-section";
+    section.id = "shadow-comparison";
+    section.append(heading());
+    if (c.status === "excluded") {
+      section.append(el("p", c.reason));
+      return section;
+    }
+    section.append(el("p", `${c.total.score?.toFixed(1)}% \xB7 \uADF8\uB9BC\uC790 \uADDC\uACA9 \uC77C\uCE58`));
+    if (!c.rows.length) section.append(el("p", "\uB514\uC790\uC778\xB7\uC6F9 \uBAA8\uB450 \uC5C6\uC74C"));
+    for (const r of c.rows) {
+      const table = el("table");
+      table.className = "shadow-table property-table";
+      const caption = el("caption", r.status === "match" ? "\uC77C\uCE58" : r.status === "added" ? "\uC6F9\uC5D0 \uCD94\uAC00" : r.status === "missing" ? "\uC6F9\uC5D0\uC11C \uB204\uB77D" : "\uAC12 \uCC28\uC774");
+      const head = el("tr");
+      head.append(el("th", "\uB514\uC790\uC778"), el("th", "\uC6F9"));
+      const row = el("tr"), expected = layerCell(r.expected), actual = layerCell(r.actual);
+      expected.dataset.label = "\uB514\uC790\uC778";
+      actual.dataset.label = "\uC6F9";
+      row.append(expected, actual);
+      for (const th of Array.from(head.children)) th.setAttribute("scope", "col");
+      const thead = el("thead"), tbody = el("tbody");
+      thead.append(head);
+      tbody.append(row);
+      table.append(caption, thead, tbody);
+      section.append(table);
+      if (r.delta && r.status === "mismatch") section.append(el("p", `\uC6F9 \u2212 \uB514\uC790\uC778: X ${formatNumber(r.delta.x)} \xB7 Y ${formatNumber(r.delta.y)} \xB7 Blur ${formatNumber(r.delta.blur)} \xB7 Spread ${formatNumber(r.delta.spread)} px \xB7 RGBA ${r.delta.color.map(formatNumber).join(", ")}`));
+    }
+    section.append(el("p", c.note));
+    return section;
   }
 
   // packages/ui/view-icon.ts
@@ -296,42 +435,178 @@
   function propertyLabel(key) {
     const wrap = document.createElement("span");
     wrap.className = "property-label";
-    const text = document.createElement("span");
-    text.className = "property-label-text";
-    text.textContent = labels[key];
-    wrap.append(propertyIcon(key), text);
+    const text2 = document.createElement("span");
+    text2.className = "property-label-text";
+    text2.textContent = labels[key];
+    wrap.append(propertyIcon(key), text2);
     return wrap;
   }
 
-  // packages/ui/format.ts
-  function formatNumber(value) {
-    if (!Number.isFinite(value)) return "\uAC12 \uBBF8\uD655\uC778";
-    if (value === 0) return "0";
-    if (Math.abs(value) < 1e-3) return String(Number(value.toPrecision(3)));
-    return String(Number(value.toFixed(3)));
+  // packages/core/src/shadows.ts
+  var shadowUnavailable = (reason, status2 = "unsupported") => ({ version: 1, status: status2, layers: [], reason });
+  var missingShadows = () => shadowUnavailable("\uADF8\uB9BC\uC790 \uBBF8\uC218\uC9D1: \uC774\uC804 JSON \uB610\uB294 API \uADFC\uAC70 \uC5C6\uC74C", "unknown");
+  var record = (x) => typeof x === "object" && x !== null && !Array.isArray(x);
+  var num = (x) => typeof x === "number" && Number.isFinite(x) && Math.abs(x) <= 1e7;
+  var rgba = (x) => Array.isArray(x) && x.length === 4 && x.every((n, i) => num(n) && n >= 0 && n <= (i === 3 ? 1 : 255));
+  function requireValue(ok) {
+    if (!ok) throw new Error("\uADF8\uB9BC\uC790 \uC2A4\uD0A4\uB9C8/\uAC12 \uC624\uB958");
   }
-  function valueText(v) {
-    if (v.status !== "supported") return v.status === "unsupported" ? "\uBBF8\uC9C0\uC6D0" : "\uAC12 \uBBF8\uD655\uC778";
-    if (v.kind === "rgba") return formatColor(v.value, currentColorFormat());
-    return `${typeof v.value === "number" ? formatNumber(v.value) : v.value}${v.kind === "px" ? " px" : ""}`;
+  function fields(x, allowed) {
+    requireValue(Object.keys(x).every((k) => allowed.includes(k)));
   }
-  var signed = (v) => `${v > 0 ? "+" : ""}${formatNumber(v)}`;
-  function deltaText(row) {
-    if (row.delta === void 0) return "\uAC12 \uB2E4\uB984";
-    if (Array.isArray(row.delta)) return row.delta.map((v, i) => `${["R", "G", "B", "\u03B1"][i]} ${signed(v)}`).join(", ");
-    return `${signed(row.delta)}${row.actual.status === "supported" && row.actual.kind === "px" ? "px" : ""}`;
+  var text = (x) => typeof x === "string" && x.length > 0 && x.length <= 8192;
+  function validateShadows(value) {
+    requireValue(record(value));
+    fields(value, ["version", "status", "layers", "reason", "css", "effects", "mapping"]);
+    requireValue(value.version === 1 && ["supported", "unsupported", "unknown"].includes(String(value.status)));
+    requireValue(Array.isArray(value.layers) && value.layers.length <= 32);
+    if (value.status !== "supported") requireValue(text(value.reason));
+    if ("reason" in value) requireValue(text(value.reason));
+    if ("css" in value) requireValue(text(value.css));
+    if ("mapping" in value) requireValue(value.mapping === "computed" || value.mapping === "getCSSAsync");
+    value.layers.forEach((l, i) => {
+      requireValue(record(l));
+      fields(l, ["index", "effectIndex", "inset", "x", "y", "blur", "spread", "color"]);
+      requireValue(l.index === i && typeof l.inset === "boolean" && num(l.x) && num(l.y) && num(l.blur) && Number(l.blur) >= 0 && num(l.spread) && rgba(l.color));
+      if ("effectIndex" in l) requireValue(Number.isInteger(l.effectIndex) && Number(l.effectIndex) >= 0 && Number(l.effectIndex) < 64);
+    });
+    if ("effects" in value) {
+      requireValue(Array.isArray(value.effects) && value.effects.length <= 64);
+      value.effects.forEach((e, i) => {
+        requireValue(record(e));
+        fields(e, ["index", "type", "visible", "x", "y", "radius", "spread", "color", "blendMode", "showShadowBehindNode"]);
+        requireValue(e.index === i && text(e.type) && typeof e.visible === "boolean");
+        for (const k of ["x", "y", "radius", "spread"]) if (k in e) requireValue(num(e[k]) && (k !== "radius" || Number(e[k]) >= 0));
+        if ("color" in e) requireValue(rgba(e.color));
+        if ("blendMode" in e) requireValue(text(e.blendMode));
+        if ("showShadowBehindNode" in e) requireValue(typeof e.showShadowBehindNode === "boolean");
+      });
+    }
   }
-  function direction(row) {
-    if (Array.isArray(row.delta)) return "sRGB \uCC44\uB110\uBCC4 \uCC28\uC774 (\uC6F9 \u2212 \uB514\uC790\uC778)";
-    if (typeof row.delta !== "number" || row.delta === 0) return "\uB514\uC790\uC778\uACFC \uC6F9\uC758 \uAC12\uC774 \uB2E4\uB985\uB2C8\uB2E4.";
-    const unit = row.actual.status === "supported" && row.actual.kind === "px" ? "px" : "";
-    return `\uC6F9 \uAC12\uC774 ${formatNumber(Math.abs(row.delta))}${unit} ${row.delta > 0 ? "\uB354 \uD07D\uB2C8\uB2E4" : "\uB354 \uC791\uC2B5\uB2C8\uB2E4"}.`;
+  function split(input, space = false) {
+    let depth = 0, current2 = "";
+    const result = [];
+    for (const ch of input) {
+      if (ch === "(") depth++;
+      if (ch === ")" && --depth < 0) throw Error("\uAD04\uD638 \uC624\uB958");
+      if (depth === 0 && (space ? /\s/.test(ch) : ch === ",")) {
+        if (current2.trim()) result.push(current2.trim());
+        else if (!space) throw Error("\uBE48 \uB808\uC774\uC5B4");
+        current2 = "";
+      } else current2 += ch;
+    }
+    if (depth !== 0 || !space && !current2.trim()) throw Error("\uAD04\uD638/\uB808\uC774\uC5B4 \uC624\uB958");
+    if (current2.trim()) result.push(current2.trim());
+    return result;
   }
-  function exclusionLabel(row) {
-    if (row.exclusion === "user") return "\uC0AC\uC6A9\uC790 \uC81C\uC678";
-    if (row.expected.status === "unsupported" || row.actual.status === "unsupported") return "\uBBF8\uC9C0\uC6D0";
-    if (row.expected.status === "unknown" || row.actual.status === "unknown") return "\uAC12 \uBBF8\uD655\uC778";
-    return "\uAC12 \uC624\uB958";
+  function color(input) {
+    const s = input.toLowerCase();
+    if (s === "transparent") return [0, 0, 0, 0];
+    if (s === "black") return [0, 0, 0, 1];
+    if (s === "white") return [255, 255, 255, 1];
+    if (/^#[\da-f]{3,8}$/.test(s)) {
+      let h = s.slice(1);
+      if (h.length === 3 || h.length === 4) h = [...h].map((c2) => c2 + c2).join("");
+      if (h.length !== 6 && h.length !== 8) return;
+      return [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16), h.length === 8 ? parseInt(h.slice(6), 16) / 255 : 1];
+    }
+    const m = /^(rgb|rgba|hsl|hsla)\((.*)\)$/.exec(s);
+    if (!m) return;
+    const tokens = m[2].trim().split(/[\s,/]+/);
+    if (tokens.length < 3 || tokens.length > 4) return;
+    const numeric = (v, max) => v.endsWith("%") ? Number(v.slice(0, -1)) * max / 100 : Number(v);
+    const a = tokens[3] === void 0 ? 1 : numeric(tokens[3], 1);
+    let c;
+    if (m[1].startsWith("rgb")) c = [numeric(tokens[0], 255), numeric(tokens[1], 255), numeric(tokens[2], 255), a];
+    else {
+      if (!tokens[1].endsWith("%") || !tokens[2].endsWith("%") || !/^[-+\d.]+(?:deg)?$/.test(tokens[0])) return;
+      const h = (Number(tokens[0].replace("deg", "")) % 360 + 360) % 360 / 60, sat = numeric(tokens[1], 1), l = numeric(tokens[2], 1);
+      if (sat < 0 || sat > 1 || l < 0 || l > 1) return;
+      const chroma = (1 - Math.abs(2 * l - 1)) * sat, x = chroma * (1 - Math.abs(h % 2 - 1)), v = l - chroma / 2;
+      const rgb = h < 1 ? [chroma, x, 0] : h < 2 ? [x, chroma, 0] : h < 3 ? [0, chroma, x] : h < 4 ? [0, x, chroma] : h < 5 ? [x, 0, chroma] : [chroma, 0, x];
+      c = [(rgb[0] + v) * 255, (rgb[1] + v) * 255, (rgb[2] + v) * 255, a];
+    }
+    return rgba(c) ? c : void 0;
+  }
+  function parseBoxShadows(css) {
+    if (css === void 0 || !css.trim()) return missingShadows();
+    if (css.length > 8192) return shadowUnavailable("box-shadow \uCD5C\uB300 \uAE38\uC774 \uCD08\uACFC");
+    if (css.trim() === "none") return { version: 1, status: "supported", layers: [], css, mapping: "computed" };
+    try {
+      const parts = split(css);
+      if (parts.length > 32) throw Error("\uCD5C\uB300 32\uAC1C \uB808\uC774\uC5B4");
+      const layers = parts.map((part, index) => {
+        let inset = false, rgbaValue;
+        const lengths = [];
+        for (const token of split(part, true)) {
+          if (token === "inset") {
+            if (inset) throw Error("\uC911\uBCF5 inset");
+            inset = true;
+            continue;
+          }
+          const c = color(token);
+          if (c) {
+            if (rgbaValue) throw Error("\uC911\uBCF5 \uC0C9");
+            rgbaValue = c;
+            continue;
+          }
+          if (!/^[+-]?(?:\d+(?:\.\d+)?|\.\d+)(?:px)?$/.test(token) || !token.endsWith("px") && Number(token) !== 0) throw Error("px/rgb/hex/hsl\uB85C \uD655\uC815 \uBD88\uAC00");
+          lengths.push(Number(token.replace("px", "")));
+        }
+        if (lengths.length < 2 || lengths.length > 4 || !rgbaValue) throw Error("\uBA85\uC2DC\uC801\uC778 \uC0C9\uACFC 2~4\uAC1C \uAE38\uC774 \uD544\uC694");
+        const [x, y, blur = 0, spread = 0] = lengths;
+        if (blur < 0 || !lengths.every(num)) throw Error("\uAE38\uC774 \uBC94\uC704");
+        return { index, inset, x, y, blur, spread, color: rgbaValue };
+      });
+      const result = { version: 1, status: "supported", layers, css, mapping: "computed" };
+      validateShadows(result);
+      return result;
+    } catch (e) {
+      return { ...shadowUnavailable(`box-shadow \uD574\uC11D \uBBF8\uC9C0\uC6D0: ${e instanceof Error ? e.message : "\uAC12 \uC624\uB958"}`), css };
+    }
+  }
+  var within = (d, t, e) => Math.abs(d) <= t + e;
+  function equal(a, b, t) {
+    return a.inset === b.inset && ["x", "y", "blur", "spread"].every((k) => within(b[k] - a[k], t.px, numericalEpsilon.px)) && a.color.every((v, i) => within(b.color[i] - v, i === 3 ? t.alpha : t.colorChannel, i === 3 ? numericalEpsilon.alpha : numericalEpsilon.colorChannel));
+  }
+  function compareShadows(expected, actual, t = normalTolerance, included2 = true) {
+    const e = expected ?? missingShadows(), a = actual ?? missingShadows();
+    const result = { expected: e, actual: a, status: "excluded", rows: [], total: { supported: 0, matched: 0, score: null }, note: "CSS \uADF8\uB9BC\uC790 \uC218\uCE58 \uBE44\uAD50 \xB7 \uC2DC\uAC01\uC801 \uC644\uC804 \uC77C\uCE58\uB97C \uBCF4\uC7A5\uD558\uC9C0 \uC54A\uC2B5\uB2C8\uB2E4." };
+    try {
+      validateShadows(e);
+      validateShadows(a);
+      for (const key of ["px", "colorChannel", "alpha"]) if (!Number.isFinite(t[key]) || t[key] < 0 || t[key] > (key === "alpha" ? 1 : key === "colorChannel" ? 255 : 1e4)) throw Error();
+    } catch {
+      result.reason = "\uADF8\uB9BC\uC790 \uAC12/\uD5C8\uC6A9\uC624\uCC28 \uAC80\uC99D \uC2E4\uD328";
+      return result;
+    }
+    if (!included2) {
+      result.reason = "\uC0AC\uC6A9\uC790\uAC00 \uADF8\uB9BC\uC790\uB97C \uBE44\uAD50\uC5D0\uC11C \uC81C\uC678";
+      return result;
+    }
+    if (e.status !== "supported" || a.status !== "supported") {
+      result.reason = `\uB514\uC790\uC778: ${e.reason ?? "\uC218\uC9D1\uB428"} / \uC6F9: ${a.reason ?? "\uC218\uC9D1\uB428"}`;
+      return result;
+    }
+    result.status = "supported";
+    const n = e.layers.length, m = a.layers.length;
+    const dp = Array.from({ length: n + 1 }, () => Array(m + 1).fill(0));
+    for (let i2 = 0; i2 <= n; i2++) dp[i2][0] = i2;
+    for (let j2 = 0; j2 <= m; j2++) dp[0][j2] = j2;
+    const cost = (i2, j2) => e.layers[i2].inset !== a.layers[j2].inset ? 3 : equal(e.layers[i2], a.layers[j2], t) ? 0 : 1.5;
+    for (let i2 = 1; i2 <= n; i2++) for (let j2 = 1; j2 <= m; j2++) dp[i2][j2] = Math.min(dp[i2 - 1][j2] + 1, dp[i2][j2 - 1] + 1, dp[i2 - 1][j2 - 1] + cost(i2 - 1, j2 - 1));
+    let i = n, j = m;
+    while (i || j) {
+      if (i && j && dp[i][j] === dp[i - 1][j - 1] + cost(i - 1, j - 1)) {
+        const expected2 = e.layers[--i], actual2 = a.layers[--j];
+        result.rows.unshift({ expected: expected2, actual: actual2, status: equal(expected2, actual2, t) ? "match" : "mismatch", delta: { x: actual2.x - expected2.x, y: actual2.y - expected2.y, blur: actual2.blur - expected2.blur, spread: actual2.spread - expected2.spread, color: actual2.color.map((c, k) => c - expected2.color[k]) } });
+      } else if (j && dp[i][j] === dp[i][j - 1] + 1) result.rows.unshift({ actual: a.layers[--j], status: "added" });
+      else result.rows.unshift({ expected: e.layers[--i], status: "missing" });
+    }
+    const supported = result.rows.length || 1, matched = result.rows.length ? result.rows.filter((r) => r.status === "match").length : 1;
+    result.total = { supported, matched, score: matched / supported * 100 };
+    if (result.rows.some((r) => r.status === "added" || r.status === "missing")) result.note += " \uC21C\uC11C\uB97C \uBCF4\uC874\uD55C \uB300\uC751\uC774\uBA70 \uCD94\uAC00\xB7\uB204\uB77D \uB610\uB294 \uC7AC\uBC30\uCE58\uAC00 \uC788\uC744 \uC218 \uC788\uC2B5\uB2C8\uB2E4.";
+    return result;
   }
 
   // packages/core/src/index.ts
@@ -358,7 +633,7 @@
     if (key === "fontWeight" || key === "opacity") return "number";
     return "px";
   }
-  var record = (v) => typeof v === "object" && v !== null && !Array.isArray(v);
+  var record2 = (v) => typeof v === "object" && v !== null && !Array.isArray(v);
   function assert(condition, message) {
     if (!condition) throw new Error(message);
   }
@@ -369,11 +644,11 @@
     assert(Object.keys(v).every((k) => allowed.includes(k)), `${path2}: \uC54C \uC218 \uC5C6\uB294 \uD0A4 \uB610\uB294 \uC704\uD5D8\uD55C \uD0A4`);
   }
   function validateProperties(v) {
-    assert(record(v), "properties \uAC1D\uCCB4 \uD544\uC694");
+    assert(record2(v), "properties \uAC1D\uCCB4 \uD544\uC694");
     exactKeys(v, keys, "properties");
     for (const key of keys) {
       const p = v[key];
-      assert(record(p), `${key}: \uBA85\uC2DC\uC801 status \uD544\uC694`);
+      assert(record2(p), `${key}: \uBA85\uC2DC\uC801 status \uD544\uC694`);
       if (p.status === "supported") {
         exactKeys(p, ["status", "kind", "value", "note"], key);
         assert(p.kind === kindFor(key), `${key}: \uC18D\uC131\uC5D0 \uB9DE\uB294 kind \uD544\uC694`);
@@ -393,10 +668,10 @@
       }
     }
   }
-  function parseDesign(text) {
-    assert(text.length <= 1024 * 1024, "JSON \uCD5C\uB300 1 MiB");
-    const doc = JSON.parse(text);
-    assert(record(doc), "\uBB38\uC11C \uAC1D\uCCB4 \uD544\uC694");
+  function parseDesign(text2) {
+    assert(text2.length <= 1024 * 1024, "JSON \uCD5C\uB300 1 MiB");
+    const doc = JSON.parse(text2);
+    assert(record2(doc), "\uBB38\uC11C \uAC1D\uCCB4 \uD544\uC694");
     exactKeys(doc, ["schemaVersion", "source", "exportedAt", "colorProfile", "nodes"], "document");
     assert(doc.schemaVersion === VERSION, "\uC9C0\uC6D0 schemaVersion\uC740 1.0\uC785\uB2C8\uB2E4. \uC784\uC758\uC758 \uAD6C\uD615 JSON\uC740 \uC790\uB3D9 \uBCC0\uD658\uD558\uC9C0 \uC54A\uC2B5\uB2C8\uB2E4.");
     assert(doc.source === "figma", "source\uB294 figma\uC5EC\uC57C \uD569\uB2C8\uB2E4");
@@ -408,14 +683,15 @@
     const ids = /* @__PURE__ */ new Set();
     function node(v, depth) {
       assert(++count <= 256 && depth <= 16, "\uB178\uB4DC \uCD5C\uB300 256\uAC1C / \uAE4A\uC774 \uCD5C\uB300 16");
-      assert(record(v), "node \uAC1D\uCCB4 \uD544\uC694");
-      exactKeys(v, ["id", "name", "type", "properties", "children"], "node");
+      assert(record2(v), "node \uAC1D\uCCB4 \uD544\uC694");
+      exactKeys(v, ["id", "name", "type", "properties", "children", "shadows"], "node");
       boundedText(v.id, "id");
       boundedText(v.name, "name");
       boundedText(v.type, "type");
       assert(!ids.has(v.id), "\uC911\uBCF5 node id");
       ids.add(v.id);
       validateProperties(v.properties);
+      if ("shadows" in v) validateShadows(v.shadows);
       if ("children" in v) {
         assert(Array.isArray(v.children), "children \uBC30\uC5F4 \uD544\uC694");
         v.children.forEach((c) => node(c, depth + 1));
@@ -425,6 +701,7 @@
     if (doc.colorProfile === "DISPLAY_P3" || doc.colorProfile === "UNKNOWN") {
       const excludeColors = (n) => {
         for (const k of keys.filter((k2) => k2.endsWith("Color"))) n.properties[k] = unavailable(`Figma ${doc.colorProfile} \uC0C9\uACF5\uAC04: sRGB \uBCC0\uD658 \uBBF8\uC9C0\uC6D0`);
+        if (n.shadows) n.shadows = { ...n.shadows, status: "unsupported", reason: "Figma \uC0C9\uACF5\uAC04 sRGB \uBCC0\uD658 \uBBF8\uC9C0\uC6D0" };
         n.children?.forEach(excludeColors);
       };
       doc.nodes.forEach(excludeColors);
@@ -448,7 +725,7 @@
     if (v.kind === "string") return typeof v.value === "string" && v.value.trim().length > 0;
     return typeof v.value === "number" && Number.isFinite(v.value) && Math.abs(v.value) <= 1e7 && (key === "letterSpacing" || v.value >= 0) && (key !== "opacity" || v.value <= 1) && (key !== "fontWeight" || v.value >= 1 && v.value <= 1e3);
   }
-  function within(delta, limit, epsilon) {
+  function within2(delta, limit, epsilon) {
     return Math.abs(delta) <= limit || Math.abs(delta) - limit <= epsilon;
   }
   function compare(expected, actual, tolerance = normalTolerance, included2 = keys) {
@@ -470,12 +747,12 @@
       else if (e.kind === "rgba") {
         const ev = e.value, av = a.value;
         row.delta = av.map((v, i) => v - ev[i]);
-        row.status = row.delta.every((d, i) => within(d, i === 3 ? tolerance.alpha : tolerance.colorChannel, i === 3 ? numericalEpsilon.alpha : numericalEpsilon.colorChannel)) ? "match" : "mismatch";
+        row.status = row.delta.every((d, i) => within2(d, i === 3 ? tolerance.alpha : tolerance.colorChannel, i === 3 ? numericalEpsilon.alpha : numericalEpsilon.colorChannel)) ? "match" : "mismatch";
       } else {
         row.delta = a.value - e.value;
         const limit = key === "opacity" ? tolerance.opacity : key === "fontWeight" ? 0 : category === "typography" ? tolerance.typographyPx : tolerance.px;
         const epsilon = key === "opacity" ? numericalEpsilon.opacity : key === "fontWeight" ? numericalEpsilon.fontWeight : numericalEpsilon.px;
-        row.status = within(row.delta, limit, epsilon) ? "match" : "mismatch";
+        row.status = within2(row.delta, limit, epsilon) ? "match" : "mismatch";
       }
       if (row.status === "excluded" && !row.exclusion) row.exclusion = "unsupported";
       rows.push(row);
@@ -494,8 +771,8 @@
     if (raw === "transparent") return colorValue2([0, 0, 0, 0]);
     const m = /^rgba?\(\s*([\d.]+)[,\s]+([\d.]+)[,\s]+([\d.]+)(?:\s*[,/]\s*([\d.]+))?\s*\)$/.exec(raw);
     if (!m) return unavailable(`CSS \uC0C9 '${raw}'\uB294 sRGB rgb/rgba \uB2E8\uC0C9 \uC544\uB2D8`);
-    const rgba2 = [Number(m[1]), Number(m[2]), Number(m[3]), m[4] === void 0 ? 1 : Number(m[4])];
-    return rgba2.every((v, i) => Number.isFinite(v) && v >= 0 && v <= (i === 3 ? 1 : 255)) ? colorValue2(rgba2) : unavailable("\uC0C9 \uBC94\uC704 \uC624\uB958");
+    const rgba3 = [Number(m[1]), Number(m[2]), Number(m[3]), m[4] === void 0 ? 1 : Number(m[4])];
+    return rgba3.every((v, i) => Number.isFinite(v) && v >= 0 && v <= (i === 3 ? 1 : 255)) ? colorValue2(rgba3) : unavailable("\uC0C9 \uBC94\uC704 \uC624\uB958");
   }
 
   // packages/ui/visual-model.ts
@@ -503,7 +780,7 @@
   function px(value) {
     return value.status === "supported" && value.kind === "px" && typeof value.value === "number" && Number.isFinite(value.value) && value.value >= 0 ? value.value : void 0;
   }
-  function rgba(value) {
+  function rgba2(value) {
     return value.status === "supported" && value.kind === "rgba" && Array.isArray(value.value) && value.value.length === 4 && value.value.every((n, i) => typeof n === "number" && Number.isFinite(n) && n >= 0 && n <= (i === 3 ? 1 : 255)) ? value.value : void 0;
   }
   function contentSize(p, source, css) {
@@ -520,9 +797,9 @@
 
   // packages/ui/visual-preview.ts
   var state = /* @__PURE__ */ new Map();
-  var el = (tag, text, cls) => {
+  var el2 = (tag, text2, cls) => {
     const n = document.createElement(tag);
-    if (text !== void 0) n.textContent = text;
+    if (text2 !== void 0) n.textContent = text2;
     if (cls) n.className = cls;
     return n;
   };
@@ -537,25 +814,25 @@
     details.id = id;
     details.className = "property-preview";
     details.open = state.get(id) ?? kind === "structure";
-    const summary = el("summary", kind === "structure" ? "\uAD6C\uC870" : kind === "color" ? "\uC0C9\uC0C1 \uBBF8\uB9AC\uBCF4\uAE30" : "\uAE00\uAF34 \uBBF8\uB9AC\uBCF4\uAE30");
+    const summary = el2("summary", kind === "structure" ? "\uAD6C\uC870" : kind === "color" ? "\uC0C9\uC0C1 \uBBF8\uB9AC\uBCF4\uAE30" : "\uAE00\uAF34 \uBBF8\uB9AC\uBCF4\uAE30");
     summary.id = id + "-summary";
     details.append(summary);
     summary.addEventListener("click", () => state.set(id, !details.open));
     details.addEventListener("toggle", () => {
       if (details.isConnected) state.set(id, details.open);
     });
-    const note = el("p", kind === "structure" ? "\uC2E4\uC81C \uD06C\uAE30\uB294 \uC218\uCE58\uB85C \uD45C\uC2DC\uD569\uB2C8\uB2E4. \uC911\uCCA9 \uC601\uC5ED\uC740 \uAE30\uD638\uC774\uBA70 \uD06C\uAE30\xB7\uB450\uAED8\xB7\uB0B4\uBD80 \uC5EC\uBC31\uC740 \uBE44\uB840\uD558\uC9C0 \uC54A\uC2B5\uB2C8\uB2E4. margin\uC740 \uC0DD\uB7B5, gap\uC740 \uBCC4\uB3C4 \uAC12\uC785\uB2C8\uB2E4." : "\uC6D0\uBCF8 \uAC12 \uC694\uC57D \xB7 \uBE44\uAD50\uC5D0\uC11C \uD655\uC778\uB41C \uCC28\uC774\uB9CC \uAC15\uC870", "preview-note");
+    const note = el2("p", kind === "structure" ? "\uC2E4\uC81C \uD06C\uAE30\uB294 \uC218\uCE58\uB85C \uD45C\uC2DC\uD569\uB2C8\uB2E4. \uC911\uCCA9 \uC601\uC5ED\uC740 \uAE30\uD638\uC774\uBA70 \uD06C\uAE30\xB7\uB450\uAED8\xB7\uB0B4\uBD80 \uC5EC\uBC31\uC740 \uBE44\uB840\uD558\uC9C0 \uC54A\uC2B5\uB2C8\uB2E4. margin\uC740 \uC0DD\uB7B5, gap\uC740 \uBCC4\uB3C4 \uAC12\uC785\uB2C8\uB2E4." : "\uC6D0\uBCF8 \uAC12 \uC694\uC57D \xB7 \uBE44\uAD50\uC5D0\uC11C \uD655\uC778\uB41C \uCC28\uC774\uB9CC \uAC15\uC870", "preview-note");
     details.append(note);
-    const wrap = el("div", void 0, "preview-sides");
+    const wrap = el2("div", void 0, "preview-sides");
     details.append(wrap);
     function metric(key, v, source, compact = false) {
-      const b = el("button", void 0, "preview-metric");
+      const b = el2("button", void 0, "preview-metric");
       b.type = "button";
       b.id = id + "-" + source + "-" + key;
       b.dataset.previewKey = key;
       const name = labels[key] + ": " + shown(v);
       b.setAttribute("aria-label", name);
-      b.append(propertyIcon(key), el("span", compact ? shown(v) : name, "preview-value"));
+      b.append(propertyIcon(key), el2("span", compact ? shown(v) : name, "preview-value"));
       b.title = name + " \xB7 " + (v.status === "supported" ? v.note ?? "\uC18D\uC131 \uD589\uC73C\uB85C \uC774\uB3D9" : na(v));
       if (status2(key) === "mismatch") b.classList.add("preview-difference");
       if (v.status !== "supported") b.classList.add("preview-na");
@@ -563,19 +840,19 @@
       return b;
     }
     for (const side of sides) {
-      const p = side.properties, card = el("section", void 0, "preview-side");
+      const p = side.properties, card = el2("section", void 0, "preview-side");
       card.dataset.source = side.source;
-      card.append(el("h3", side.title));
+      card.append(el2("h3", side.title));
       wrap.append(card);
       if (kind === "structure") {
         let corners2 = function(keys2) {
-          const row = el("div", void 0, "corner-row");
+          const row = el2("div", void 0, "corner-row");
           for (const key of keys2) row.append(metric(key, p[key], side.source, true));
           return row;
         }, region2 = function(name, cls, keys2, center2) {
-          const box2 = el("div", void 0, "box-region " + cls);
+          const box2 = el2("div", void 0, "box-region " + cls);
           box2.dataset.region = cls;
-          box2.append(el("span", name, "region-label"));
+          box2.append(el2("span", name, "region-label"));
           for (const [i, key] of keys2.entries()) {
             const button = metric(key, p[key], side.source, true);
             button.dataset.position = ["top", "right", "bottom", "left"][i];
@@ -586,10 +863,10 @@
         };
         var corners = corners2, region = region2;
         const w = px(p.width), h = px(p.height);
-        const map = el("div", void 0, "box-map");
+        const map = el2("div", void 0, "box-map");
         map.setAttribute("aria-label", side.title + " \uD14C\uB450\uB9AC\xB7\uB0B4\uBD80 \uC5EC\uBC31\xB7\uBAA8\uC11C\uB9AC \uC18D\uC131");
-        const center = el("div", void 0, "box-center");
-        const dimensions = el("div", void 0, "box-dimensions");
+        const center = el2("div", void 0, "box-center");
+        const dimensions = el2("div", void 0, "box-dimensions");
         dimensions.dataset.layoutWidth = w === void 0 ? "N/A" : String(w);
         dimensions.dataset.layoutHeight = h === void 0 ? "N/A" : String(h);
         dimensions.dataset.geometry = w === void 0 || h === void 0 ? "unknown" : "known";
@@ -601,45 +878,45 @@
         border.append(corners2(["radiusBottomLeft", "radiusBottomRight"]));
         map.append(border);
         card.append(map);
-        card.append(el("p", "Radius\uB294 Border\uC758 \uB124 \uBAA8\uC11C\uB9AC \uAC12 \xB7 \uC2E4\uC81C \uACE1\uC120 \uB80C\uB354\uB9C1 \uC5C6\uC74C", "preview-note"));
-        const metrics = el("div", void 0, "preview-metrics");
+        card.append(el2("p", "Radius\uB294 Border\uC758 \uB124 \uBAA8\uC11C\uB9AC \uAC12 \xB7 \uC2E4\uC81C \uACE1\uC120 \uB80C\uB354\uB9C1 \uC5C6\uC74C", "preview-note"));
+        const metrics = el2("div", void 0, "preview-metrics");
         for (const key of structureKeys.filter((k) => k === "rowGap" || k === "columnGap")) metrics.append(metric(key, p[key], side.source));
         card.append(metrics);
         const inner = contentSize(p, side.source, side.css);
-        const content = el("p", "content " + shown(inner.width) + " \xD7 " + shown(inner.height), "preview-content");
+        const content = el2("p", "content " + shown(inner.width) + " \xD7 " + shown(inner.height), "preview-content");
         content.title = inner.width.status === "supported" ? "\uC6F9 \uD655\uC778\uB41C border-box \u2212 padding \u2212 border" : inner.width.reason;
         content.dataset.status = inner.width.status;
         card.append(content);
-        if (inner.width.status !== "supported") card.append(el("p", inner.width.reason, "preview-note"));
+        if (inner.width.status !== "supported") card.append(el2("p", inner.width.reason, "preview-note"));
       } else if (kind === "color") {
         const colorKeys = sides.length === 1 && side.source === "figma" ? ["textColor", "backgroundColor"] : ["backgroundColor", "textColor", "borderTopColor", "borderRightColor", "borderBottomColor", "borderLeftColor"];
         for (const key of colorKeys) {
           if (sides.length === 1 && side.source === "figma" && p[key].status !== "supported") continue;
-          const row = el("div", void 0, "preview-color-row");
+          const row = el2("div", void 0, "preview-color-row");
           const label = metric(key, p[key], side.source);
-          label.replaceChildren(propertyIcon(key), el("span", labels[key], "preview-value"));
+          label.replaceChildren(propertyIcon(key), el2("span", labels[key], "preview-value"));
           row.append(label);
-          const value = rgba(p[key]);
+          const value = rgba2(p[key]);
           if (value) {
-            const checker = el("span", void 0, "preview-checker");
-            const paint = el("span", void 0, "preview-paint");
+            const checker = el2("span", void 0, "preview-checker");
+            const paint = el2("span", void 0, "preview-paint");
             paint.style.backgroundColor = `rgba(${value.join(",")})`;
             bindColor(paint, value);
             paint.setAttribute("aria-hidden", "true");
             checker.append(paint);
-            const text = colorValue(value);
+            const text2 = colorValue(value);
             if (sides.length === 1 && side.source === "figma") {
-              const pair = el("span", void 0, "preview-color-value");
-              pair.append(checker, text);
+              const pair = el2("span", void 0, "preview-color-value");
+              pair.append(checker, text2);
               row.append(pair);
-            } else row.append(checker, text);
-          } else row.append(el("span", "N/A", "preview-na"));
+            } else row.append(checker, text2);
+          } else row.append(el2("span", "N/A", "preview-na"));
           card.append(row);
         }
       } else {
-        const list = el("div", void 0, "preview-fonts");
+        const list = el2("div", void 0, "preview-fonts");
         for (const key of ["fontFamily", "fontSize", "fontWeight", "lineHeight", "letterSpacing"]) list.append(metric(key, p[key], side.source));
-        card.append(list, el("p", "\uC694\uCCAD\uB41C font-family \uC694\uC57D \xB7 \uC2E4\uC81C \uC0AC\uC6A9 font/fallback\uC740 \uD655\uC778\uD558\uC9C0 \uC54A\uC74C", "preview-note"));
+        card.append(list, el2("p", "\uC694\uCCAD\uB41C font-family \uC694\uC57D \xB7 \uC2E4\uC81C \uC0AC\uC6A9 font/fallback\uC740 \uD655\uC778\uD558\uC9C0 \uC54A\uC74C", "preview-note"));
       }
     }
     return details;
@@ -666,10 +943,10 @@
   function categoryLabel(category) {
     const label = document.createElement("span");
     label.className = "category-label";
-    const text = document.createElement("span");
-    text.className = "category-label-text";
-    text.textContent = categoryLabels[category];
-    label.append(svg(paths2[category], "category-icon"), text);
+    const text2 = document.createElement("span");
+    text2.className = "category-label-text";
+    text2.textContent = categoryLabels[category];
+    label.append(svg(paths2[category], "category-icon"), text2);
     return label;
   }
 
@@ -687,26 +964,48 @@
     if (target.querySelector("details")) rememberedOpen = Array.from(target.querySelectorAll("details[open]")).map((d) => d.id);
     if (document.activeElement instanceof HTMLElement && target.contains(document.activeElement) && document.activeElement.id) rememberedFocus = document.activeElement.id;
   }
-  var element = (tag, text, className) => {
+  var element = (tag, text2, className) => {
     const n = document.createElement(tag);
-    if (text !== void 0) n.textContent = text;
+    if (text2 !== void 0) n.textContent = text2;
     if (className) n.className = className;
     return n;
   };
   function detail(id, title) {
-    const d = document.createElement("details");
+    const d = document.createElement("section");
     d.id = id;
     d.className = "result-detail";
-    const s = element("summary", title);
-    s.id = id + "-summary";
-    d.append(s);
+    const h = element("h3", title);
+    h.id = id + "-summary";
+    d.append(h);
     return d;
+  }
+  function stageHeading(title = "\uBE44\uAD50 \uACB0\uACFC") {
+    const header = element("div", void 0, "card-heading step-header");
+    const h = element("h2");
+    const number = element("span", "\u2461");
+    number.setAttribute("aria-hidden", "true");
+    h.append(number, document.createTextNode(" " + title));
+    header.append(h);
+    return header;
+  }
+  function fixedPreview(...args) {
+    const old = visualPreview(...args), section = element("section", void 0, "property-preview preview-fixed");
+    section.id = old.id;
+    const title = element("h3", args[1] === "structure" ? "\uC601\uC5ED \uAD6C\uC870" : args[1] === "color" ? "\uC0C9\uC0C1" : "\uD0C0\uC774\uD3EC\uADF8\uB798\uD53C");
+    title.id = old.id + "-summary";
+    section.setAttribute("aria-labelledby", title.id);
+    section.append(title);
+    for (const child of Array.from(old.children)) if (child.tagName !== "SUMMARY") section.append(child);
+    if (args[1] !== "structure") section.querySelector(":scope > .preview-note")?.remove();
+    else section.querySelector(":scope > .preview-note").textContent = "Border \uC548\uC5D0 Padding\uACFC \uD06C\uAE30, \uB124 \uBAA8\uC11C\uB9AC\uC5D0 Radius\uB97C \uD45C\uC2DC\uD569\uB2C8\uB2E4. \uB3C4\uC2DD\uC740 \uBE44\uB840 \uCD95\uCC99\uC774 \uC544\uB2D9\uB2C8\uB2E4.";
+    return section;
   }
   function emptyResult(target, title, description, action, run) {
     remember(target);
     target.replaceChildren();
     const wrap = element("div", void 0, "empty");
-    wrap.append(element("h2", title), element("p", description));
+    target.append(stageHeading("\uC694\uC18C \uC815\uBCF4"));
+    wrap.append(element("h3", title), element("p", description));
     const button = element("button", action);
     button.id = "next-action";
     setAction(button, action.includes("\uBC29\uBC95") ? "help" : action.includes("JSON") ? "import" : "refresh", action);
@@ -743,15 +1042,14 @@
     parent.append(bar, note);
   }
   function renderWebOnly(target, actual, css) {
+    target.replaceChildren(stageHeading("\uC694\uC18C \uC815\uBCF4"));
     const preview = element("div");
     preview.id = "web-preview";
-    viewControls(preview, false, () => {
-    });
     if (actual) {
       const note = element("p", void 0, "preview-note");
       note.id = "web-value-note";
       note.setAttribute("role", "status");
-      for (const kind of ["structure", "color", "typography"]) preview.append(visualPreview("visual-" + kind, kind, [{ title: "\uC6F9", source: "web", properties: actual, css }], () => void 0, (key) => {
+      for (const kind of ["structure", "color", "typography"]) preview.append(fixedPreview("visual-" + kind, kind, [{ title: "\uC6F9", source: "web", properties: actual, css }], () => void 0, (key) => {
         const v = actual[key];
         note.textContent = labels[key] + ": " + (v.status === "supported" ? valueText(v) : v.reason);
       }));
@@ -771,11 +1069,12 @@
     extra.id = "comparison-extra";
     extra.hidden = !extraOpen;
     main.hidden = extraOpen;
-    target.append(main, extra);
+    target.append(stageHeading(), main, extra);
+    const shadowDifferences = c.shadows?.rows.filter((r) => r.status !== "match").length ?? 0;
     const differences = c.rows.filter((r) => r.status === "mismatch"), excluded = c.rows.filter((r) => r.status === "excluded" && r.exclusion !== "user"), userExcluded = c.rows.filter((r) => r.exclusion === "user");
-    const heading = element("div", void 0, "result-heading");
-    heading.append(element("div", c.total.score === null ? "\uBE44\uAD50 \uAC00\uB2A5\uD55C \uC18D\uC131\uC774 \uC5C6\uC5B4\uC694" : `${c.total.score.toFixed(1)}% \uC77C\uCE58`, "score"), element("span", differences.length ? `${differences.length}\uAC1C \uC18D\uC131\uC5D0 \uCC28\uC774` : "\uD655\uC778\uB41C \uCC28\uC774 \uC5C6\uC74C", `result-count${differences.length ? "" : " good"}`));
-    main.append(heading);
+    const heading2 = element("div", void 0, "result-heading");
+    heading2.append(element("div", c.total.score === null ? "\uBE44\uAD50 \uAC00\uB2A5\uD55C \uC18D\uC131\uC774 \uC5C6\uC5B4\uC694" : `${c.total.score.toFixed(1)}% \uC77C\uCE58`, "score"), element("span", differences.length + shadowDifferences ? `${differences.length + shadowDifferences}\uAC1C \uC18D\uC131\uC5D0 \uCC28\uC774` : "\uD655\uC778\uB41C \uCC28\uC774 \uC5C6\uC74C", `result-count${differences.length + shadowDifferences ? "" : " good"}`));
+    main.append(heading2);
     const context = element("dl", void 0, "comparison-context");
     for (const [label, value] of [["\uB514\uC790\uC778", designName], ["\uC6F9 \uC694\uC18C", snapshot2.tag + (snapshot2.id ? "#" + snapshot2.id : "")]]) {
       const field = element("div");
@@ -786,12 +1085,12 @@
     }
     main.append(context);
     const note = element("div", void 0, "result-note");
-    for (const text2 of [`${c.total.supported}\uAC1C \uBE44\uAD50 \uC911 ${c.total.matched}\uAC1C \uC77C\uCE58`, ...excluded.length + userExcluded.length ? [`\uCD94\uAC00 \uC815\uBCF4 ${excluded.length + userExcluded.length}\uAC1C`] : []]) note.append(element("span", text2));
+    for (const text3 of [`${c.total.supported}\uAC1C \uBE44\uAD50 \uC911 ${c.total.matched}\uAC1C \uC77C\uCE58`, ...excluded.length + userExcluded.length ? [`\uCD94\uAC00 \uC815\uBCF4 ${excluded.length + userExcluded.length}\uAC1C`] : []]) note.append(element("span", text3));
     main.append(note);
     if (c.total.score === null) main.append(element("p", "\uC774 \uB450 \uB300\uC0C1\uC5D0\uC11C\uB294 \uBE44\uAD50\uD560 \uC218 \uC788\uB294 \uC18D\uC131\uC744 \uCC3E\uC9C0 \uBABB\uD588\uC5B4\uC694. \uC544\uB798 \uC81C\uC678 \uC774\uC720\uB97C \uD655\uC778\uD558\uAC70\uB098 \uB2E4\uB978 \uC694\uC18C\uB97C \uC120\uD0DD\uD574 \uC8FC\uC138\uC694.", "muted"));
-    else if (!differences.length) main.append(element("p", "\uBE44\uAD50\uD560 \uC218 \uC788\uB294 \uC18D\uC131\uC740 \uC124\uC815\uD55C \uAE30\uC900 \uC548\uC5D0\uC11C \uBAA8\uB450 \uAC19\uC544\uC694. \uB2E4\uB978 \uBD80\uBD84\uB3C4 \uD655\uC778\uD558\uB824\uBA74 Elements\uC5D0\uC11C \uB2E4\uC2DC \uC120\uD0DD\uD558\uC138\uC694.", "all-good"));
+    else if (!(differences.length + shadowDifferences)) main.append(element("p", "\uBE44\uAD50\uD560 \uC218 \uC788\uB294 \uC18D\uC131\uC740 \uC124\uC815\uD55C \uAE30\uC900 \uC548\uC5D0\uC11C \uBAA8\uB450 \uAC19\uC544\uC694. \uB2E4\uB978 \uBD80\uBD84\uB3C4 \uD655\uC778\uD558\uB824\uBA74 Elements\uC5D0\uC11C \uB2E4\uC2DC \uC120\uD0DD\uD558\uC138\uC694.", "all-good"));
     const counts = element("div", void 0, "comparison-counts");
-    for (const [number, label, kind] of [[differences.length, "\uCC28\uC774", "bad"], [c.total.supported, "\uBE44\uAD50 \uAC00\uB2A5", "supported"], [excluded.length, "\uBE44\uAD50 \uC81C\uC678", "excluded"]]) {
+    for (const [number, label, kind] of [[differences.length + shadowDifferences, "\uCC28\uC774", "bad"], [c.total.supported, "\uBE44\uAD50 \uAC00\uB2A5", "supported"], [excluded.length, "\uBE44\uAD50 \uC81C\uC678", "excluded"]]) {
       const box2 = element("div", void 0, kind);
       box2.append(element("strong", String(number)), element("span", label));
       counts.append(box2);
@@ -821,9 +1120,12 @@
         }
       }
     }
-    viewControls(main, true, () => renderComparison(target, evidence2, c, snapshot2, designName));
+    const inspection = element("section", void 0, "element-inspection");
+    inspection.id = "element-inspection";
+    inspection.append(element("h2", "\uC694\uC18C \uC18D\uC131"));
+    viewControls(inspection, true, () => renderComparison(target, evidence2, c, snapshot2, designName));
     const sides = together ? [{ title: "Figma", source: "figma", properties: expected }, { title: "\uC6F9", source: "web", properties: actual, css: snapshot2.computed }] : [{ title: "\uC6F9", source: "web", properties: actual, css: snapshot2.computed }];
-    for (const kind of ["structure", "color", "typography"]) main.append(visualPreview("visual-" + kind, kind, sides, (key) => c.rows.find((r) => r.key === key)?.status, showProperty));
+    for (const kind of ["structure", "color", "typography"]) inspection.append(fixedPreview("visual-" + kind, kind, sides, (key) => c.rows.find((r) => r.key === key)?.status, showProperty));
     const toolbar = element("div", void 0, "table-toolbar");
     for (const [mode, title] of [["differences", "\uCC28\uC774\uB9CC"], ["all", "\uC804\uCCB4 \uBE44\uAD50\uAC12"]]) {
       const b = element("button", title);
@@ -840,56 +1142,72 @@
     const grid = element("table", void 0, "visual-comparison");
     grid.append(element("caption", view === "all" ? "\uBE44\uAD50 \uAC00\uB2A5\uD55C \uC804\uCCB4 \uC18D\uC131" : "\uCC28\uC774\uAC00 \uC788\uB294 \uC18D\uC131"));
     const gridHead = element("thead"), gridHeadRow = element("tr");
-    for (const title of ["\uC18D\uC131", "\uB514\uC790\uC778", "\uC6F9", "\uCC28\uC774 (\uC6F9 \u2212 \uB514\uC790\uC778)"]) gridHeadRow.append(element("th", title));
+    for (const [index, title] of ["\uC18D\uC131", "\uB514\uC790\uC778", "\uC6F9", "\uCC28\uC774 (\uC6F9 \u2212 \uB514\uC790\uC778)"].entries()) {
+      const th = element("th", title);
+      th.id = "comparison-column-" + index;
+      th.setAttribute("scope", "col");
+      gridHeadRow.append(th);
+    }
     gridHead.append(gridHeadRow);
     grid.append(gridHead);
     let previousCategory = "";
-    const gridBody = element("tbody");
+    let gridBody = element("tbody");
+    const bodies = [];
     for (const row of view === "differences" ? differences : c.rows.filter((r) => r.status === "match" || r.status === "mismatch")) {
-      if (view === "all" && row.category !== previousCategory) {
+      if (row.category !== previousCategory) {
+        gridBody = element("tbody");
+        bodies.push(gridBody);
         previousCategory = row.category;
         const section = element("tr", void 0, "table-group");
         const title = element("th");
         title.append(categoryLabel(row.category));
         title.setAttribute("colspan", "4");
-        title.setAttribute("scope", "colgroup");
+        title.id = "comparison-group-" + row.category;
+        title.setAttribute("scope", "rowgroup");
         section.append(title);
         gridBody.append(section);
       }
       const tr = element("tr", void 0, row.status === "mismatch" ? "diff-card mismatch" : row.status);
       tr.dataset.key = row.key;
+      if ([row.expected, row.actual].some((v) => v.status === "supported" && (v.kind === "rgba" || v.kind === "string"))) tr.classList.add("long-value-row");
       const property = element("th");
       property.append(propertyLabel(row.key));
       property.setAttribute("scope", "row");
-      if (view === "differences") property.append(element("small", categoryLabels[row.category], "property-category"));
+      property.id = "comparison-property-" + row.key;
+      property.setAttribute("headers", "comparison-group-" + row.category);
       tr.append(property);
       for (const [index, v] of [row.expected, row.actual].entries()) {
         const cell = element("td");
         cell.dataset.label = index === 0 ? "\uB514\uC790\uC778" : "\uC6F9";
+        cell.setAttribute("headers", `comparison-group-${row.category} comparison-property-${row.key} comparison-column-${index + 1}`);
         if (v.status === "supported" && typeof v.value === "number") cell.classList.add("numeric");
         const strong = element("strong");
         strong.append(v.status === "supported" && v.kind === "rgba" ? colorValue(v.value) : document.createTextNode(valueText(v)));
-        cell.append(strong);
+        const value = element("span", void 0, "comparison-value");
+        value.append(strong);
+        cell.append(value);
         if (v.status === "supported" && v.kind === "rgba") {
-          const rgba2 = v.value;
+          const rgba3 = v.value;
           const swatch = element("span", void 0, "color-swatch");
-          bindColor(swatch, rgba2);
-          swatch.style.backgroundColor = `rgba(${rgba2.join(",")})`;
+          bindColor(swatch, rgba3);
+          swatch.style.backgroundColor = `rgba(${rgba3.join(",")})`;
           swatch.setAttribute("aria-hidden", "true");
-          cell.prepend(swatch);
+          value.prepend(swatch);
         }
         tr.append(cell);
       }
       const delta = deltaText(row);
       const change = element("td", row.status === "match" ? "\uC77C\uCE58" : row.status === "excluded" ? "\uBE44\uAD50 \uC81C\uC678" : delta, "delta");
       change.dataset.label = "\uCC28\uC774";
+      change.setAttribute("headers", `comparison-group-${row.category} comparison-property-${row.key} comparison-column-3`);
       if (row.status === "excluded") change.title = row.reason ?? "\uBE44\uAD50 \uC81C\uC678";
       if (row.status === "mismatch") change.append(element("small", direction(row), "diff-direction"));
       tr.append(change);
       gridBody.append(tr);
     }
-    grid.append(gridBody);
-    if (gridBody.children.length) main.append(grid);
+    grid.append(...bodies);
+    if (bodies.length) main.append(grid);
+    main.append(inspection);
     const more = element("button", excluded.length + userExcluded.length ? `\uC790\uC138\uD788 \uBCF4\uAE30 \xB7 \uCD94\uAC00 \uC815\uBCF4 ${excluded.length + userExcluded.length}\uAC1C` : "\uC790\uC138\uD788 \uBCF4\uAE30", "secondary");
     more.id = "comparison-more";
     more.setAttribute("aria-expanded", String(extraOpen));
@@ -945,6 +1263,11 @@
     for (const [category, score] of Object.entries(c.categories)) badges.append(element("span", `${categoryLabels[category]}: ${score.score === null ? "\uBE44\uAD50 \uBD88\uAC00" : score.score.toFixed(0) + "%"} (${score.matched}/${score.supported})`, "badge"));
     categorySection.append(badges);
     extra.append(categorySection);
+    if (c.shadows) {
+      if (c.shadows.status === "supported") main.append(shadowComparison(c.shadows));
+      else extra.append(shadowComparison(c.shadows));
+      if (c.shadows.expected.effects) extra.append(shadowDetails(c.shadows.expected));
+    }
     const originals = element("section", void 0, "result-detail");
     originals.id = "original-values";
     originals.append(element("h2", "\uC6D0\uBCF8 \uAC12"), element("pre", JSON.stringify(c.rows.map((r) => ({ property: r.key, expected: r.expected, actual: r.actual, delta: r.delta, status: r.status, exclusion: r.exclusion })), null, 2)));
@@ -955,8 +1278,9 @@
     raw.append(element("pre", JSON.stringify({ classes: snapshot2.classes, inline: snapshot2.inline, rect: snapshot2.rect, computed: snapshot2.computed }, null, 2)));
     evidence2.append(raw);
     for (const candidate of snapshot2.candidates ?? []) {
-      const d = document.createElement("details");
-      d.append(element("summary", `${candidate.inherited ? "\uBD80\uBAA8 \uADDC\uCE59 \uD6C4\uBCF4" : "\uC120\uD0DD \uC694\uC18C \uADDC\uCE59 \uD6C4\uBCF4"}: ${candidate.selector}`), element("p", candidate.source), element("p", candidate.context.join(" \u2192 ") || "\uCD5C\uC0C1\uC704 \uADDC\uCE59"), element("pre", candidate.declarations));
+      const d = document.createElement("section");
+      d.className = "result-detail";
+      d.append(element("h3", `${candidate.inherited ? "\uBD80\uBAA8 \uADDC\uCE59 \uD6C4\uBCF4" : "\uC120\uD0DD \uC694\uC18C \uADDC\uCE59 \uD6C4\uBCF4"}: ${candidate.selector}`), element("p", candidate.source), element("p", candidate.context.join(" \u2192 ") || "\uCD5C\uC0C1\uC704 \uADDC\uCE59"), element("pre", candidate.declarations));
       evidence2.append(d);
     }
     const limits = element("ul");
@@ -969,8 +1293,8 @@
     if (focused) document.getElementById(focused)?.focus({ preventScroll: true });
     rememberedFocus = "";
     const announcement = document.getElementById("result-announcement");
-    const text = `${differences.length}\uAC1C \uCC28\uC774, ${c.total.matched}/${c.total.supported}\uAC1C \uC77C\uCE58, ${excluded.length}\uAC1C \uC81C\uC678`;
-    if (announcement.textContent !== text) announcement.textContent = text;
+    const text2 = `${differences.length + shadowDifferences}\uAC1C \uCC28\uC774, ${c.total.matched}/${c.total.supported}\uAC1C \uC77C\uCE58, ${excluded.length}\uAC1C \uC81C\uC678`;
+    if (announcement.textContent !== text2) announcement.textContent = text2;
   }
 
   // apps/chrome-extension/src/collect.ts
@@ -1022,45 +1346,49 @@
       };
       var visitSheet = visitSheet2, walk = walk2;
       if (!selected || typeof selected !== "object" || !("nodeType" in selected) || selected.nodeType !== 1) return { ok: false, error: "Elements\uC5D0\uC11C DOM \uC694\uC18C \uD558\uB098\uB97C \uC120\uD0DD\uD574\uC8FC\uC138\uC694 ($0)." };
-      const el2 = selected;
-      if (!el2.isConnected) return { ok: false, error: "\uC120\uD0DD DOM\uC774 \uC81C\uAC70\uB418\uC5C8\uC2B5\uB2C8\uB2E4. Elements\uC5D0\uC11C \uB2E4\uC2DC \uC120\uD0DD\uD574\uC8FC\uC138\uC694." };
-      const win = el2.ownerDocument.defaultView;
+      const el3 = selected;
+      const overlayRoot = el3.getRootNode();
+      if (el3.closest("[data-figcheck-picker],[data-figcheck-pin]") || "host" in overlayRoot && overlayRoot.host.closest("[data-figcheck-picker],[data-figcheck-pin]")) return { ok: false, error: "FigCheck \uC624\uBC84\uB808\uC774\uB294 \uC218\uC9D1 \uB300\uC0C1\uC774 \uC544\uB2D9\uB2C8\uB2E4." };
+      if (!el3.isConnected) return { ok: false, error: "\uC120\uD0DD DOM\uC774 \uC81C\uAC70\uB418\uC5C8\uC2B5\uB2C8\uB2E4. Elements\uC5D0\uC11C \uB2E4\uC2DC \uC120\uD0DD\uD574\uC8FC\uC138\uC694." };
+      const win = el3.ownerDocument.defaultView;
       if (!win) return { ok: false, error: "\uC120\uD0DD DOM\uC758 window\uB97C \uD655\uC778\uD560 \uC218 \uC5C6\uC2B5\uB2C8\uB2E4." };
-      const s = win.getComputedStyle(el2), rect = el2.getBoundingClientRect();
-      const names = ["width", "height", "box-sizing", "overflow-x", "overflow-y", "scrollbar-gutter", "padding-top", "padding-right", "padding-bottom", "padding-left", "row-gap", "column-gap", "display", "font-family", "font-size", "font-weight", "line-height", "letter-spacing", "color", "background-color", "background-image", "border-top-width", "border-right-width", "border-bottom-width", "border-left-width", "border-top-color", "border-right-color", "border-bottom-color", "border-left-color", "border-top-style", "border-right-style", "border-bottom-style", "border-left-style", "border-top-left-radius", "border-top-right-radius", "border-bottom-right-radius", "border-bottom-left-radius", "opacity", "transform", "zoom"];
+      const s = win.getComputedStyle(el3), rect = el3.getBoundingClientRect();
+      const names = ["width", "height", "box-sizing", "overflow-x", "overflow-y", "scrollbar-gutter", "padding-top", "padding-right", "padding-bottom", "padding-left", "row-gap", "column-gap", "display", "font-family", "font-size", "font-weight", "line-height", "letter-spacing", "color", "background-color", "background-image", "border-top-width", "border-right-width", "border-bottom-width", "border-left-width", "border-top-color", "border-right-color", "border-bottom-color", "border-left-color", "border-top-style", "border-right-style", "border-bottom-style", "border-left-style", "border-top-left-radius", "border-top-right-radius", "border-bottom-right-radius", "border-bottom-left-radius", "opacity", "transform", "zoom", "box-shadow", "text-shadow", "filter", "backdrop-filter", "mix-blend-mode"];
       const computed = {};
       names.forEach((name) => computed[name] = s.getPropertyValue(name));
-      let geometryIssue = "";
-      if (el2.namespaceURI !== "http://www.w3.org/1999/xhtml") geometryIssue = "SVG \uB4F1 \uBE44-HTML \uC694\uC18C: CSS border-box \uB9E4\uD551 \uBBF8\uC9C0\uC6D0";
-      if (el2.getClientRects().length !== 1 || s.display === "inline" || s.display === "contents") geometryIssue = "inline/\uBD84\uC808/\uBE44\uB80C\uB354 \uC694\uC18C: \uB2E8\uC77C border-box \uD06C\uAE30 \uD655\uC815 \uBD88\uAC00";
-      for (let n = el2, depth = 0; n && depth < 64; n = n.parentElement ?? (n.getRootNode() instanceof win.ShadowRoot ? n.getRootNode().host : null), depth++) {
+      let geometryIssue = "", shadowIssue = "";
+      if (el3.namespaceURI !== "http://www.w3.org/1999/xhtml") geometryIssue = "SVG \uB4F1 \uBE44-HTML \uC694\uC18C: CSS border-box \uB9E4\uD551 \uBBF8\uC9C0\uC6D0";
+      if (el3.getClientRects().length !== 1 || s.display === "inline" || s.display === "contents") geometryIssue = "inline/\uBD84\uC808/\uBE44\uB80C\uB354 \uC694\uC18C: \uB2E8\uC77C border-box \uD06C\uAE30 \uD655\uC815 \uBD88\uAC00";
+      for (let n = el3, depth = 0; n && depth < 64; n = n.parentElement ?? (n.getRootNode() instanceof win.ShadowRoot ? n.getRootNode().host : null), depth++) {
         const cs = win.getComputedStyle(n);
+        if (cs.filter && cs.filter !== "none" || cs.getPropertyValue("backdrop-filter") && cs.getPropertyValue("backdrop-filter") !== "none" || cs.mixBlendMode && cs.mixBlendMode !== "normal") shadowIssue = "\uC790\uAE30/\uC870\uC0C1 filter \uB610\uB294 blend \uD569\uC131: box-shadow \uBE44\uAD50 \uC81C\uC678";
+        if (n === el3 && cs.textShadow && cs.textShadow !== "none") shadowIssue = "text-shadow\uB294 box-shadow \uB300\uC751 \uBC94\uC704 \uBC16";
         if (cs.transform !== "none" || ["rotate", "scale", "translate"].some((k) => {
           const v = cs.getPropertyValue(k);
           return v && v !== "none";
         }) || cs.getPropertyValue("zoom") && !["1", "normal"].includes(cs.getPropertyValue("zoom"))) geometryIssue = "\uC790\uAE30/\uC870\uC0C1 transform \uB610\uB294 zoom: rect\uC640 Figma local \uD06C\uAE30 \uBE44\uAD50 \uC81C\uC678";
         if (depth === 63) geometryIssue = "\uC870\uC0C1 \uAC80\uC0AC \uCD5C\uB300 64\uB2E8\uACC4 \uCD08\uACFC";
       }
-      const directText = Array.from(el2.childNodes).some((n) => n.nodeType === 3 && (n.textContent ?? "").trim());
+      const directText = Array.from(el3.childNodes).some((n) => n.nodeType === 3 && (n.textContent ?? "").trim());
       const pseudoText = ["::before", "::after"].some((pseudo) => {
-        const content = win.getComputedStyle(el2, pseudo).content;
+        const content = win.getComputedStyle(el3, pseudo).content;
         return content && content !== "none" && content !== "normal" && content !== '""';
       });
-      const textIssue = el2.children.length || pseudoText ? "\uC790\uC2DD \uC694\uC18C/\uC0DD\uC131 \uD14D\uC2A4\uD2B8 \uD3EC\uD568: \uBD80\uBAA8 computedStyle\uB85C \uC804\uCCB4 \uD14D\uC2A4\uD2B8 \uB300\uD45C \uBD88\uAC00" : !directText ? "\uC9C1\uC811 \uD14D\uC2A4\uD2B8 \uC5C6\uC74C: typography/textColor \uBE44\uAD50 \uC81C\uC678" : "";
+      const textIssue = el3.children.length || pseudoText ? "\uC790\uC2DD \uC694\uC18C/\uC0DD\uC131 \uD14D\uC2A4\uD2B8 \uD3EC\uD568: \uBD80\uBAA8 computedStyle\uB85C \uC804\uCCB4 \uD14D\uC2A4\uD2B8 \uB300\uD45C \uBD88\uAC00" : !directText ? "\uC9C1\uC811 \uD14D\uC2A4\uD2B8 \uC5C6\uC74C: typography/textColor \uBE44\uAD50 \uC81C\uC678" : "";
       const candidates = [], evidenceLimits = [];
-      const subjects = [el2];
-      for (let n = el2.parentElement; n && subjects.length < 9; n = n.parentElement) subjects.push(n);
-      const root = el2.getRootNode();
-      const sheets = [...Array.from(el2.ownerDocument.styleSheets), ...Array.from(el2.ownerDocument.adoptedStyleSheets ?? [])];
+      const subjects = [el3];
+      for (let n = el3.parentElement; n && subjects.length < 9; n = n.parentElement) subjects.push(n);
+      const root = el3.getRootNode();
+      const sheets = [...Array.from(el3.ownerDocument.styleSheets), ...Array.from(el3.ownerDocument.adoptedStyleSheets ?? [])];
       if (root instanceof win.ShadowRoot) sheets.push(...Array.from(root.styleSheets), ...Array.from(root.adoptedStyleSheets));
       let scanned = 0;
       const visited = /* @__PURE__ */ new Set();
-      const relevant = /^(width|height|padding|gap|row-gap|column-gap|font|line-height|letter-spacing|color|background|border|opacity|all|--)/;
+      const relevant = /^(width|height|padding|gap|row-gap|column-gap|font|line-height|letter-spacing|color|background|border|box-shadow|text-shadow|filter|opacity|all|--)/;
       sheets.forEach((sheet) => visitSheet2(sheet, []));
       evidenceLimits.push("\uD6C4\uBCF4\uB9CC \uD45C\uC2DC: cascade \uC2B9\uC790, inheritance, shorthand, layer/important, scope/container, animation, source map/\uC6D0\uBCF8 \uC904, authoring Tailwind\uB294 \uCD94\uC801\uBD88\uAC00.");
       if (root instanceof win.ShadowRoot) evidenceLimits.push("Shadow DOM scoped cascade/slot \uC0C1\uC18D\uC740 \uBD80\uBD84\uC870\uD68C");
       if (subjects.length === 9) evidenceLimits.push("\uC0C1\uC18D \uD6C4\uBCF4 \uC870\uC0C1\uC740 \uCD5C\uB300 8\uB2E8\uACC4");
-      return { ok: true, capturedAt: (/* @__PURE__ */ new Date()).toISOString(), tag: el2.tagName.slice(0, 128), id: el2.id.slice(0, 2048), classes: Array.from(el2.classList).slice(0, 100).map((c) => c.slice(0, 256)), inline: (el2.getAttribute("style") ?? "").slice(0, 4096), computed, rect: { width: rect.width, height: rect.height }, geometryIssue, textIssue, candidates, evidenceLimits: evidenceLimits.slice(0, 100) };
+      return { ok: true, capturedAt: (/* @__PURE__ */ new Date()).toISOString(), tag: el3.tagName.slice(0, 128), id: el3.id.slice(0, 2048), classes: Array.from(el3.classList).slice(0, 100).map((c) => c.slice(0, 256)), inline: (el3.getAttribute("style") ?? "").slice(0, 4096), computed, rect: { width: rect.width, height: rect.height }, geometryIssue, shadowIssue, textIssue, candidates, evidenceLimits: evidenceLimits.slice(0, 100) };
     } catch (e) {
       return { ok: false, error: `\uC218\uC9D1 \uC2E4\uD328: ${e instanceof Error ? e.message : "\uC54C \uC218 \uC5C6\uB294 \uC624\uB958"}` };
     }
@@ -1097,6 +1425,11 @@
     if (snapshot2.textIssue) for (const key of ["fontFamily", "fontSize", "fontWeight", "lineHeight", "letterSpacing", "textColor"]) p[key] = unavailable(snapshot2.textIssue, "unknown");
     return p;
   }
+  function normalizeShadows(snapshot2) {
+    if (!snapshot2.ok) return shadowUnavailable("DOM \uADF8\uB9BC\uC790 \uBBF8\uC218\uC9D1", "unknown");
+    if (snapshot2.geometryIssue || snapshot2.shadowIssue) return shadowUnavailable(snapshot2.geometryIssue || snapshot2.shadowIssue);
+    return parseBoxShadows(snapshot2.computed?.["box-shadow"]);
+  }
 
   // apps/chrome-extension/src/panel.ts
   var $ = (id) => document.getElementById(id);
@@ -1104,7 +1437,7 @@
   var results = $("results");
   var evidence = $("evidence");
   var domLabel = $("dom-label");
-  for (const [id, action, title] of [["paste-toggle", "clipboard", "Figma \uB514\uC790\uC778 JSON \uBD99\uC5EC\uB123\uAE30"], ["import-button", "import", "Figma \uB514\uC790\uC778 JSON \uD30C\uC77C \uAC00\uC838\uC624\uAE30"], ["paste-import", "check", "\uC785\uB825\uD55C \uB514\uC790\uC778 JSON \uAC80\uC0AC \uBC0F \uC801\uC6A9"], ["paste-cancel", "cancel", "\uC785\uB825 \uCD08\uC548 \uCDE8\uC18C"], ["clear", "clear", "\uC800\uC7A5\uD55C \uB514\uC790\uC778 JSON \uBE44\uC6B0\uAE30"], ["pick", "select", "\uC6F9 \uC694\uC18C \uC120\uD0DD"], ["capture", "refresh", "\uC120\uD0DD\uD55C \uC6F9 \uC694\uC18C \uAC12 \uB2E4\uC2DC \uD655\uC778"]]) setAction($(id), action, void 0, title);
+  for (const [id, action, title] of [["paste-toggle", "clipboard", "Figma \uB514\uC790\uC778 JSON \uBD99\uC5EC\uB123\uAE30"], ["import-button", "import", "Figma \uB514\uC790\uC778 JSON \uD30C\uC77C \uAC00\uC838\uC624\uAE30"], ["paste-import", "check", "\uC785\uB825\uD55C \uB514\uC790\uC778 JSON \uAC80\uC0AC \uBC0F \uC801\uC6A9"], ["paste-cancel", "cancel", "\uC785\uB825 \uCD08\uC548 \uCDE8\uC18C"], ["clear", "clear", "\uC800\uC7A5\uD55C \uB514\uC790\uC778 JSON \uBE44\uC6B0\uAE30"], ["pick", "select", "\uC6F9 \uC694\uC18C \uC120\uD0DD"]]) setAction($(id), action, void 0, title);
   var picker = $("node");
   var fileInput = $("file");
   var design;
@@ -1125,9 +1458,10 @@
   }
   var pickerWindow = window;
   pickerWindow.figcheckPickerState = (s) => {
+    $("pick").dataset.pinned = String(s.pinned === true);
     pickerToken = s.token;
     $("picker-status").textContent = s.message;
-    setAction($("pick"), s.active ? "cancel" : "select", s.active ? "\uC694\uC18C \uC120\uD0DD \uCDE8\uC18C (Esc)" : "\uC694\uC18C \uC120\uD0DD");
+    setAction($("pick"), s.active ? "cancel" : "select", s.active ? "\uC694\uC18C \uC120\uD0DD \uCDE8\uC18C (Esc)" : s.pinned ? "\uB2E4\uC2DC \uC120\uD0DD" : "\uC694\uC18C \uC120\uD0DD");
     $("pick").setAttribute("aria-pressed", String(s.active));
     if (s.forget) {
       ownSelection = false;
@@ -1147,7 +1481,7 @@
     if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.code === "KeyX") {
       e.preventDefault();
       pickerRequest("toggle", true);
-    } else if (e.key === "Escape" && $("pick").getAttribute("aria-pressed") === "true") pickerRequest("cancel");
+    } else if (e.key === "Escape" && ($("pick").getAttribute("aria-pressed") === "true" || $("pick").dataset.pinned === "true")) pickerRequest("cancel");
   });
   chrome.commands.getAll((commands) => {
     const shortcut = commands.find((c) => c.name === "figcheck-pick")?.shortcut;
@@ -1155,29 +1489,29 @@
   });
   chrome.runtime.sendMessage({ type: "figcheck-panel-ready", tabId: chrome.devtools.inspectedWindow.tabId }).catch(() => {
   });
-  var writeStatus = (text, error = false) => {
-    status.textContent = text;
+  var writeStatus = (text2, error = false) => {
+    status.textContent = text2;
     status.classList.toggle("error", error);
   };
   function updateFlow() {
     const node = design && flattenNodes(design).find((n) => n.id === picker.value);
     const ready = Boolean(node && hasWebSelection());
     $("design-summary").title = node ? `${node.name} (${node.type})` : "";
-    $("design-state").textContent = node ? "" : "\uC544\uC9C1 \uC5C6\uC74C";
+    $("design-state").textContent = node ? "" : "\uC120\uD0DD \uC0AC\uD56D";
     $("design-state").hidden = Boolean(node);
     $("design-state").classList.toggle("ready", Boolean(node));
-    $("design-summary").textContent = node ? node.name : "JSON \uC785\uB825 \uB300\uAE30";
+    $("design-summary").textContent = node ? node.name : "";
+    $("design-summary").hidden = !node;
     $("web-state").textContent = hasWebSelection() ? "" : "\uC120\uD0DD \uB300\uAE30";
     $("web-state").hidden = hasWebSelection();
     $("web-state").classList.toggle("ready", hasWebSelection());
     $("clear").hidden = !design;
-    $("capture").hidden = !hasWebSelection();
     $("paste-toggle").hidden = $("paste-details").open;
     setAction($("paste-toggle"), "clipboard", design ? "\uB514\uC790\uC778 \uBCC0\uACBD" : "JSON \uBD99\uC5EC\uB123\uAE30", "Figma \uB514\uC790\uC778 JSON \uBD99\uC5EC\uB123\uAE30");
     $("node-label").hidden = !design || flattenNodes(design).length < 2;
     setAction($("import-button"), "import", "\uD30C\uC77C \uAC00\uC838\uC624\uAE30", "Figma \uB514\uC790\uC778 JSON \uD30C\uC77C \uAC00\uC838\uC624\uAE30");
     $("css-details").hidden = !ready;
-    for (const [id, done, current2] of [["step-design", Boolean(node), !node], ["step-web", hasWebSelection(), Boolean(node) && !hasWebSelection()], ["step-result", false, ready]]) {
+    for (const [id, done, current2] of [["step-design", Boolean(node), false], ["step-web", hasWebSelection(), !hasWebSelection()], ["step-result", false, hasWebSelection()]]) {
       const step = $(id);
       step.classList.toggle("done", done);
       if (current2) step.setAttribute("aria-current", "step");
@@ -1220,6 +1554,15 @@
     label.append(all, document.createTextNode(" " + categoryNames[group]));
     legend.append(label);
     field.append(legend);
+    field.className = "property-category-card";
+    field.dataset.category = group;
+    const options = document.createElement("div");
+    options.className = "property-options";
+    options.id = "options-" + group;
+    all.setAttribute("aria-controls", options.id);
+    all.setAttribute("aria-label", categoryNames[group] + " \uC804\uCCB4 \uC120\uD0DD");
+    field.append(options);
+    const subgroupTargets = /* @__PURE__ */ new Map();
     for (const key of list) {
       const l = document.createElement("label"), input = document.createElement("input");
       input.type = "checkbox";
@@ -1231,7 +1574,24 @@
         changeIncluded();
       };
       l.append(input, document.createTextNode(" " + labels[key]));
-      field.append(l);
+      const subgroup = group === "spacing" ? key.startsWith("padding") ? "\uB0B4\uBD80 \uC5EC\uBC31" : "\uC694\uC18C \uC0AC\uC774 \uAC04\uACA9" : group === "border" ? key.startsWith("radius") ? "\uBAA8\uC11C\uB9AC \uBC18\uACBD" : key.endsWith("Width") ? "\uD14C\uB450\uB9AC \uB450\uAED8" : "\uD14C\uB450\uB9AC \uC0C9\uC0C1" : "";
+      if (subgroup) {
+        let target = subgroupTargets.get(subgroup);
+        if (!target) {
+          const section = document.createElement("div"), heading2 = document.createElement("h4");
+          section.className = "property-subgroup";
+          heading2.textContent = subgroup;
+          heading2.id = "subgroup-" + key;
+          target = document.createElement("div");
+          target.className = "property-option-list";
+          target.setAttribute("role", "group");
+          target.setAttribute("aria-labelledby", heading2.id);
+          section.append(heading2, target);
+          options.append(section);
+          subgroupTargets.set(subgroup, target);
+        }
+        target.append(l);
+      } else options.append(l);
     }
     all.onchange = () => {
       for (const key of list) {
@@ -1244,25 +1604,68 @@
     $("property-groups").append(field);
   }
   updateGroups();
+  var includeShadows = true;
+  try {
+    includeShadows = localStorage.getItem("figcheck.shadows.included") !== "false";
+  } catch {
+  }
+  var shadowLabel = document.createElement("label");
+  var shadowInput = document.createElement("input");
+  shadowInput.type = "checkbox";
+  shadowInput.id = "include-shadows";
+  shadowInput.checked = includeShadows;
+  shadowLabel.append(shadowInput, document.createTextNode(" \uADF8\uB9BC\uC790"));
+  var shadowField = document.createElement("fieldset");
+  var shadowLegend = document.createElement("legend");
+  shadowField.className = "property-category-card shadow-setting";
+  shadowField.dataset.category = "shadow";
+  shadowLegend.append(shadowLabel);
+  shadowField.append(shadowLegend);
+  $("property-groups").append(shadowField);
+  shadowInput.onchange = () => {
+    includeShadows = shadowInput.checked;
+    try {
+      localStorage.setItem("figcheck.shadows.included", String(includeShadows));
+    } catch {
+    }
+    render();
+  };
+  for (const [id, enabled] of [["include-all", true], ["include-none", false]]) {
+    $(id).onclick = () => {
+      included.clear();
+      if (enabled) keys.forEach((key) => included.add(key));
+      for (const key of keys) $("include-" + key).checked = enabled;
+      includeShadows = enabled;
+      shadowInput.checked = enabled;
+      try {
+        localStorage.setItem("figcheck.shadows.included", String(enabled));
+      } catch {
+      }
+      changeIncluded();
+    };
+  }
   function render() {
     updateFlow();
     if (!design) {
       evidence.replaceChildren();
-      emptyResult(results, "\uB514\uC790\uC778 \uD30C\uC77C\uBD80\uD130 \uAC00\uC838\uC640 \uBCFC\uAE4C\uC694?", "JSON\uC744 \uBD99\uC5EC\uB123\uAC70\uB098 \uD30C\uC77C\uC744 \uC120\uD0DD\uD558\uC138\uC694.", "\uB514\uC790\uC778 JSON \uAC00\uC838\uC624\uAE30", openPaste);
-      $("next-action").remove();
-      try {
-        const actual = hasWebSelection() && snapshot?.ok ? normalizeDOM(snapshot) : void 0;
+      const webReady = hasWebSelection();
+      if (webReady) try {
+        const actual = snapshot?.ok ? normalizeDOM(snapshot) : void 0;
         if (actual) validateProperties(actual);
         renderWebOnly(results, actual, snapshot?.computed);
       } catch {
-        renderWebOnly(results);
         writeStatus("\uC6F9 \uAC12\uC744 \uD655\uC778\uD560 \uC218 \uC5C6\uC2B5\uB2C8\uB2E4. \uC694\uC18C\uB97C \uB2E4\uC2DC \uC120\uD0DD\uD558\uC138\uC694.", true);
+      }
+      else {
+        emptyResult(results, "\uC6F9 \uC694\uC18C\uB97C \uC120\uD0DD\uD558\uC138\uC694", "\uD398\uC774\uC9C0\uC758 \uC694\uC18C\uB97C \uD074\uB9AD\uD574 \uD06C\uAE30\xB7\uC5EC\uBC31\xB7\uC0C9\uC0C1\xB7\uAE00\uAF34\uC744 \uD655\uC778\uD569\uB2C8\uB2E4. Figma \uBE44\uAD50\uB294 \uD544\uC694\uD560 \uB54C \uCD94\uAC00\uD558\uC138\uC694.", "\uC694\uC18C \uC120\uD0DD", () => pickerRequest("toggle"));
+        $("next-action").remove();
       }
       return;
     }
     if (!snapshot?.ok || !hasWebSelection()) {
       evidence.replaceChildren();
-      emptyResult(results, "\uC774\uC81C \uC6F9\uC5D0\uC11C \uBE44\uAD50\uD560 \uBD80\uBD84\uC744 \uACE8\uB77C\uC8FC\uC138\uC694", "Elements \uD0ED\uC5D0\uC11C \uC6F9 \uC694\uC18C\uB97C \uC120\uD0DD\uD558\uACE0 \uB3CC\uC544\uC624\uC138\uC694. \uC120\uD0DD\uC774 \uBC14\uB00C\uBA74 \uACB0\uACFC\uB3C4 \uAC31\uC2E0\uB429\uB2C8\uB2E4.", "\uC6F9 \uC694\uC18C \uC120\uD0DD \uBC29\uBC95 \uBCF4\uAE30", showSelectionGuide);
+      emptyResult(results, "\uC6F9 \uC694\uC18C\uB97C \uC120\uD0DD\uD558\uC138\uC694", "\uB514\uC790\uC778\uC740 \uC900\uBE44\uB418\uC5B4 \uC788\uC5B4\uC694. \uC704\uC758 \uC694\uC18C \uC120\uD0DD \uBC84\uD2BC\uC73C\uB85C \uBE44\uAD50\uD560 \uC6F9 \uC694\uC18C\uB97C \uD074\uB9AD\uD558\uAC70\uB098 Elements \uD0ED\uC5D0\uC11C \uC120\uD0DD\uD558\uC138\uC694.", "\uC6F9 \uC694\uC18C \uC120\uD0DD \uBC29\uBC95 \uBCF4\uAE30", showSelectionGuide);
+      $("next-action").remove();
       return;
     }
     try {
@@ -1270,7 +1673,13 @@
       if (!node) throw new Error("\uBE44\uAD50\uD560 \uB514\uC790\uC778\uC744 \uBAA9\uB85D\uC5D0\uC11C \uC120\uD0DD\uD574\uC8FC\uC138\uC694.");
       const actual = normalizeDOM(snapshot);
       validateProperties(actual);
-      renderComparison(results, evidence, compare(node.properties, actual, normalTolerance, [...included]), snapshot, node.name);
+      const comparison = compare(node.properties, actual, normalTolerance, [...included]);
+      comparison.shadows = compareShadows(node.shadows, normalizeShadows(snapshot), normalTolerance, includeShadows);
+      const shadowTotal = comparison.shadows.total;
+      comparison.total.supported += shadowTotal.supported;
+      comparison.total.matched += shadowTotal.matched;
+      comparison.total.score = comparison.total.supported ? comparison.total.matched / comparison.total.supported * 100 : null;
+      renderComparison(results, evidence, comparison, snapshot, node.name);
       if (status.classList.contains("error")) writeStatus("\uBE44\uAD50 \uAE30\uC900\uC744 \uC801\uC6A9\uD588\uC5B4\uC694.");
     } catch (e) {
       const message = e instanceof Error ? e.message : "\uBE44\uAD50 \uAE30\uC900\uC744 \uD655\uC778\uD574\uC8FC\uC138\uC694.";
@@ -1292,8 +1701,8 @@
     $("paste-details").open = false;
     render();
   }
-  function importText(text) {
-    const doc = parseDesign(text);
+  function importText(text2) {
+    const doc = parseDesign(text2);
     setDesign(doc);
     try {
       localStorage.setItem(storageKey, JSON.stringify(doc));
@@ -1315,6 +1724,7 @@
     updateFlow();
     pasteInput.focus();
   }
+  $("compare-optional").onclick = openPaste;
   $("paste-toggle").onclick = openPaste;
   $("paste-details").addEventListener("toggle", () => {
     $("paste-toggle").setAttribute("aria-expanded", String($("paste-details").open));
@@ -1371,12 +1781,31 @@
     }
     if (!v.computed || typeof v.computed !== "object" || Object.values(v.computed).some((s) => typeof s !== "string" || s.length > 4096)) throw new Error("computedStyle \uD615\uC2DD \uC624\uB958");
     if (!v.rect || !Number.isFinite(v.rect.width) || !Number.isFinite(v.rect.height) || v.rect.width < 0 || v.rect.height < 0) throw new Error("rect \uD615\uC2DD \uC624\uB958");
-    for (const key of ["capturedAt", "tag", "id", "inline", "geometryIssue", "textIssue"]) if (v[key] !== void 0 && (typeof v[key] !== "string" || v[key].length > 4096)) throw new Error("DOM \uBB38\uC790\uC5F4 \uD615\uC2DD \uC624\uB958");
+    for (const key of ["capturedAt", "tag", "id", "inline", "geometryIssue", "shadowIssue", "textIssue"]) if (v[key] !== void 0 && (typeof v[key] !== "string" || v[key].length > 4096)) throw new Error("DOM \uBB38\uC790\uC5F4 \uD615\uC2DD \uC624\uB958");
     for (const list of [v.classes, v.evidenceLimits]) if (!Array.isArray(list) || list.length > 100 || list.some((s) => typeof s !== "string" || s.length > 4096)) throw new Error("DOM \uBAA9\uB85D \uD615\uC2DD \uC624\uB958");
     if (!Array.isArray(v.candidates) || v.candidates.length > 100 || v.candidates.some((c) => !c || typeof c.selector !== "string" || typeof c.source !== "string" || typeof c.declarations !== "string" || typeof c.inherited !== "boolean" || !Array.isArray(c.context) || c.context.some((s) => typeof s !== "string"))) throw new Error("CSS \uD6C4\uBCF4 \uD615\uC2DD \uC624\uB958");
     return v;
   }
-  function capture(quiet = false) {
+  var lastFingerprint = "";
+  var probePending = false;
+  function capture(quiet = false, changed = false) {
+    if (quiet && !changed) {
+      if (probePending || !hasWebSelection()) return;
+      probePending = true;
+      const generation = epoch;
+      const selected = ownSelection ? `window[Symbol.for('figcheck.picker.v1')]?.token===${JSON.stringify(pickerToken)}?window[Symbol.for('figcheck.picker.v1')].selected:undefined` : "$0";
+      chrome.devtools.inspectedWindow.eval(`(${selectionFingerprint.toString()})(${selected})`, (value, error) => {
+        probePending = false;
+        if (generation !== epoch || document.hidden) return;
+        if (error?.isException || error?.isError || typeof value !== "string") return;
+        if (value !== lastFingerprint) {
+          lastFingerprint = value;
+          capture(true, true);
+        }
+      });
+      return;
+    }
+    if (!quiet) lastFingerprint = "";
     const previous = snapshot;
     const token = ++epoch;
     if (!quiet) {
@@ -1392,10 +1821,10 @@
         snapshot = safeSnapshot(value);
         if (!snapshot.ok) resetComparisonView();
         domLabel.textContent = snapshot.ok ? `${snapshot.tag}${snapshot.id ? "#" + snapshot.id : ""}` : "\uC120\uD0DD\uD55C \uC6F9 \uC694\uC18C\uB97C \uC77D\uC9C0 \uBABB\uD588\uC5B4\uC694.";
-        $("web-meta").textContent = snapshot.ok ? `${snapshot.rect?.width.toFixed(1)} \xD7 ${snapshot.rect?.height.toFixed(1)}px. \uD604\uC7AC \uC120\uD0DD\uC744 \uD655\uC778\uD588\uC5B4\uC694${["BODY", "HTML"].includes(snapshot.tag ?? "") ? " \uD398\uC774\uC9C0 \uC804\uCCB4\uAC00 \uC120\uD0DD\uB410\uC5B4\uC694. \uC6D0\uD558\uB294 \uBD80\uBD84\uC778\uC9C0 \uD655\uC778\uD558\uC138\uC694." : ""}` : `${snapshot.error ?? "\uC694\uC18C\uAC00 \uC5C6\uC2B5\uB2C8\uB2E4."} Elements\uC5D0\uC11C \uB2E4\uC2DC \uC120\uD0DD\uD558\uACE0 \uB3CC\uC544\uC624\uC138\uC694.`;
+        $("web-meta").textContent = snapshot.ok ? `${snapshot.rect?.width.toFixed(1)} \xD7 ${snapshot.rect?.height.toFixed(1)}px${["BODY", "HTML"].includes(snapshot.tag ?? "") ? " \uD398\uC774\uC9C0 \uC804\uCCB4\uAC00 \uC120\uD0DD\uB410\uC5B4\uC694. \uC6D0\uD558\uB294 \uBD80\uBD84\uC778\uC9C0 \uD655\uC778\uD558\uC138\uC694." : ""}` : `${snapshot.error ?? "\uC694\uC18C \uC120\uD0DD \uBC84\uD2BC\uC73C\uB85C \uBE44\uAD50\uD560 \uC694\uC18C\uB97C \uC120\uD0DD\uD558\uC138\uC694."}`;
         if (snapshot.ok && !hasWebSelection()) {
           domLabel.textContent = "\uC6F9 \uC694\uC18C \uC120\uD0DD \uB300\uAE30";
-          $("web-meta").textContent = "\uD398\uC774\uC9C0 \uC804\uCCB4\uAC00 \uAE30\uBCF8 \uC120\uD0DD\uB418\uC5B4 \uC788\uC5B4\uC694. \uC544\uB798 \uC548\uB0B4\uC5D0\uC11C \uC694\uC18C \uC120\uD0DD \uBC29\uBC95\uC744 \uD655\uC778\uD558\uC138\uC694.";
+          $("web-meta").textContent = "\uD398\uC774\uC9C0 \uC804\uCCB4\uAC00 \uAE30\uBCF8 \uC120\uD0DD\uB410\uC5B4\uC694. \uC694\uC18C \uC120\uD0DD\uC73C\uB85C \uBC94\uC704\uB97C \uC881\uD788\uC138\uC694.";
         }
         if (quiet && previous && JSON.stringify({ ...previous, capturedAt: void 0 }) === JSON.stringify({ ...snapshot, capturedAt: void 0 })) return;
         render();
@@ -1403,7 +1832,7 @@
         resetComparisonView();
         snapshot = void 0;
         domLabel.textContent = "\uC6F9 \uC694\uC18C\uB97C \uD655\uC778\uD558\uC9C0 \uBABB\uD588\uC5B4\uC694.";
-        $("web-meta").textContent = (e instanceof Error ? e.message : "\uC218\uC9D1 \uC624\uB958") + " Elements\uC5D0\uC11C \uB2E4\uC2DC \uC120\uD0DD\uD558\uACE0 \uD655\uC778 \uBC84\uD2BC\uC744 \uB20C\uB7EC\uC8FC\uC138\uC694.";
+        $("web-meta").textContent = (e instanceof Error ? e.message : "\uC218\uC9D1 \uC624\uB958") + " Elements\uC5D0\uC11C \uB2E4\uC2DC \uC120\uD0DD\uD558\uC138\uC694.";
         render();
       }
     });
@@ -1417,9 +1846,9 @@
     const token = ++importing;
     try {
       if (file.size > 1024 * 1024) throw new Error("JSON \uCD5C\uB300 1 MiB");
-      const text = await file.text();
+      const text2 = await file.text();
       if (token !== importing) return;
-      importText(text);
+      importText(text2);
     } catch (e) {
       if (token !== importing) return;
       render();
@@ -1439,10 +1868,6 @@
     localStorage.removeItem(storageKey);
     writeStatus("Figma JSON\uACFC \uB85C\uCEEC \uC800\uC7A5\uC744 \uC9C0\uC6E0\uC2B5\uB2C8\uB2E4.");
     render();
-  };
-  $("capture").onclick = () => {
-    selectionConfirmed = true;
-    capture();
   };
   $("import-button").onclick = () => fileInput.click();
   picker.onchange = () => {
@@ -1485,7 +1910,7 @@
   capture();
   var timer = setInterval(() => {
     if (!document.hidden) capture(true);
-  }, 2500);
+  }, 750);
   window.addEventListener("unload", () => {
     clearInterval(timer);
     ++epoch;
